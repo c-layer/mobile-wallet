@@ -1,0 +1,33 @@
+page-transfer {
+    ion-title > * {  
+        color: color($colors, primary-light) !important;
+    }
+
+    .container {
+        background-color: color($colors, secondary-light) !important;
+    }
+
+    ion-list.transfer {
+        padding: 10px;
+        background-color: color($colors, secondary-dark) !important;        
+    }
+
+    ion-item { 
+        background-color: color($colors, secondary-dark) !important;        
+    }
+
+    ion-select {
+        max-width: 100%;
+        width: 100%;
+    }
+
+    .action {
+        background-color: color($colors, primary) !important;
+        color: color($colors, light) !important;
+    }
+
+    .scan {
+//        margin-left: 10px;
+//        margin-right: 10px;
+    }
+}

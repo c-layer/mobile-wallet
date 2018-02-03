@@ -1,0 +1,57 @@
+page-wallet-secure {
+    .container {
+        background-color: color($colors, secondary-dark);
+        height: 100%;
+    }
+
+    ion-list > * {
+        background-color: color($colors, secondary-dark) !important;
+    }
+
+    ion-label, ion-input {
+        color: color($colors, light);
+    }
+
+    h2 {
+        white-space: normal;
+    }
+
+    .hint {
+        font: small italic;
+        margin: 5px;
+        padding: 0px;
+        align-self: flex-start;
+    }
+
+    div.reminder > p {
+        color: color($colors, light);
+        text-align: center;
+    }
+
+    .next {
+        margin-top: 30px;
+        height: 36px !important;
+    }
+
+    .unlock-warn {
+        color: color($colors, danger);
+        text-align: center;
+    }
+
+    .loading {
+        display: flex;
+        flex-flow: row wrap;
+        margin-top: 50px;
+    }
+
+    .loading > * {
+        color: color($colors, secondary-light);
+        text-align: center;
+        font-weight: bold;
+        width: 100%;
+    }
+
+    ion-spinner > * > * {
+        stroke: color($colors, light) !important;
+    }
+}

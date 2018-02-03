@@ -1,0 +1,96 @@
+page-account-details {
+    ion-title > * {  
+        color: color($colors, primary-light) !important;
+    }
+    
+    .container {
+        background-color: color($colors, secondary-light) !important;
+        width: 100%;
+    }
+
+    .container > div {
+        background-color: color($colors, secondary-light) !important;
+        width: 100%;
+        margin-top: 56px;
+        margin-bottom: 56px;
+    }
+
+    .container > div > div {
+        height: 100%;
+        width: 100%;
+        padding: 15px;
+    }
+
+    ion-list {
+        margin: 0px !important;
+
+        display: flex;
+        flex-flow: column;
+        height: 100%;
+        padding: 10px;
+        background-color: color($colors, secondary-dark) !important; 
+    }
+
+    ion-list > * {
+        background-color: color($colors, secondary-dark) !important; 
+        flex: 0 1 auto;       
+    }
+
+    ion-item {
+        background-color: color($colors, secondary-dark) !important;
+    }
+    
+    ion-item > div > div > ion-label {
+        margin: 0px !important;
+        padding: 0px !important;
+    }
+    
+    ion-item.qrcode {
+        flex: 1 1 auto;
+        margin: auto;
+        padding: 2% 4% 1% 4%;
+    }
+
+    ion-item.qrcode > div {
+        padding: 0px !important;
+    }
+
+    .qrcode > img {
+        display: block;
+        margin: auto;
+        width: 60%;
+        min-width: 100px;
+        max-width: 220px;
+    }
+
+    .key {
+        background-color: color($colors, secondary-dark) !important;
+        color: color($colors, secondary-light) !important;
+        font-size: 10px;
+        font-weight: bold;
+    }
+
+    .action {
+        width: 90%;
+        margin: 10px auto;
+    }
+
+    .input {
+        background-color: color($colors, secondary-light) !important;
+        padding-left: 4px;
+        padding-right: 4px;
+        color: color($colors, primary-dark) !important;
+    }
+
+    .action-confirm {
+        background-color: color($colors, primary) !important;
+        float:left;
+        width: 45%;
+    }
+
+    .action-danger {
+        background-color: color($colors, danger) !important;
+        float:right;
+        width: 45%;
+    }
+}

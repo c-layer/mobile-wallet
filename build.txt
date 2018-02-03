@@ -1,0 +1,3 @@
+"jarsigner -verbose -sigalg SHA1withRSA -digestalg SHA1 -keystore ..\my-release-key-mtwallet.keystore platforms\android\app\build\outputs\apk\release\app-release-unsigned.apk mtwallet" 
+"rm MtWallet.apk" 
+"zipalign -v 4 platforms\android\app\build\outputs\apk\release\app-release-unsigned.apk MtWallet.apk" 

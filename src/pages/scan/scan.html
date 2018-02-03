@@ -1,0 +1,12 @@
+<ion-header>
+  <header [colorAttr]="'primary-dark'">Scan</header>
+</ion-header>
+
+<ion-content padding class="container">
+  <div>
+    <ion-label class="label">Scan public keys or private keys</ion-label>
+    <div class="qrcode">
+      <img src="assets/icon/qrcode.png" (click)="scan()" />
+    </div>
+  </div>
+</ion-content>

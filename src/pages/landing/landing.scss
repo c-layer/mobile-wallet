@@ -1,0 +1,92 @@
+page-landing {
+    .container {
+        background-color: color($colors, primary-dark);
+    }
+
+    .container > div > div {
+        height: 100%;
+    }
+
+    div.title {
+        height: 70%;
+        display: flex;
+        flex-flow: row wrap;
+        align-items: center;
+        color: color($colors, light);
+    }
+
+    div.title > p {
+        flex: 1 auto;
+        align-self:  flex-start;
+    }
+
+    ion-title {
+        width: 100%;
+        flex: 0 100%;
+        align-self:  flex-end;
+    }
+
+    .toolbar-title {
+        font-size: 2.4em;
+        color: color($colors, light);
+    }
+
+    .actions {
+        height: 30%;
+        min-height: 150px;
+        display: flex;
+        flex-flow: row wrap;
+        justify-content: space-around;
+        align-items: center;
+        padding: 15px;
+    }
+
+    button.button {
+        flex: 1 auto;
+        background-color: color($colors, secondary-dark);
+        color: color($colors, light);
+        border-color: color($colors, secondary-light);
+    }
+
+    button.outline {
+        background-color: color($colors, primary-dark);
+    }
+
+    button.button:hover {
+        background-color: color($colors, secondary-light) !important;
+        color: color($colors, secondary-dark) !important;
+        border-color: color($colors, secondary-dark) !important;
+    }
+
+    .loading {
+        display: flex;
+        flex-flow: row wrap;
+        margin-top: 50px;
+    }
+
+    .loading > * {
+        color: color($colors, secondary-light);
+        font-weight: bold;
+        text-align: center;
+        width: 100%;
+    }
+
+    ion-spinner > * > * {
+        stroke: color($colors, light) !important;
+    }
+
+    @keyframes fadeIn {
+        from {
+          opacity: 0;
+        }
+    
+        to {
+          opacity: 1;
+        }
+    }
+
+    .fadeIn {
+        animation-name: fadeIn;
+        animation-duration: 4s;
+    }
+}

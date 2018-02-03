@@ -1,0 +1,32 @@
+page-wallet-creation {
+
+    .container {
+        background-color: color($colors, secondary-dark);
+        height: 100%;
+    }
+
+    .loading {
+        display: flex;
+        flex-flow: row wrap;
+        margin-top: 50px;
+    }
+
+    .loading > * {
+        color: color($colors, secondary-light);
+        font-weight: bold;
+        text-align: center;
+        width: 100%;
+    }
+
+    ion-spinner > * > * {
+        stroke: color($colors, light) !important;
+    }
+
+    .error {
+        color: color($colors, danger);
+        font: italic;
+        margin: 5px;
+        padding: 0px;
+        align-self: flex-start;
+    }
+}

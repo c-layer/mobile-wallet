@@ -1,0 +1,38 @@
+<ion-header>
+  <header [colorAttr]="'primary-dark'">Accounts</header>
+</ion-header>
+
+
+<ion-content class="container">
+  <ion-list>
+    <ion-item class="header" no-lines>
+      <button ion-button (click)="createAccount()" class="action">Generate new</button>
+    </ion-item>
+    <ion-item-divider>Deterministic Wallet</ion-item-divider>
+    <button ion-item *ngFor="let account of getDeterministicWalletAccounts()" 
+      (click)="selectAccount($event, account)" class="account"
+      [ngClass]="{ 'account-active': (account.active) }">
+      <ion-icon name="person" item-start></ion-icon>
+      <h2 class="account-name">{{account.name}}</h2>
+      <ion-icon *ngIf="hasPrivateKey(account)" name="key" item-end></ion-icon>
+      <button ion-button item-end class="action" (click)="goToDetailsPage($event, account)">
+        QRCode
+      </button>
+    </button>
+    <ion-item-divider color="secondary-dark" *ngIf="hasExternalAccounts()">External Account</ion-item-divider>
+    <button ion-item *ngFor="let account of getExternalAccounts()"
+      (click)="selectAccount($event, account)" class="account"
+      [ngClass]="{ 'account-active': (account.active) }">
+        <ion-icon name="person" item-start></ion-icon>
+        <h2 class="account-name">{{account.name}}</h2>
+        <ion-icon *ngIf="hasPrivateKey(account)" name="key" item-end></ion-icon>
+        <button ion-button item-end class="action" (click)="goToDetailsPage($event, account)">
+          QRCode
+        </button>
+      </button>  
+  </ion-list>
+
+  <ion-card>
+    <ion-label *ngIf="accounts.length == 0" text-center color="warn">No defined accounts</ion-label>
+  </ion-card>
+</ion-content>

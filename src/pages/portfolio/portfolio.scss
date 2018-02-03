@@ -1,0 +1,22 @@
+page-portfolio {
+    ion-title > * {  
+        color: color($colors, primary-light) !important;
+    }
+
+    .container {
+        background-color: color($colors, secondary-light) !important;
+    }
+
+    .token {
+        background-color: color($colors, secondary-light) !important;        
+        color: color($colors, secondary-dark) !important;
+    }
+  
+    div.item-inner {
+        border-color: color($colors, dark) !important;
+    }
+
+    .token-svg {
+        width: 40px;
+    }
+}

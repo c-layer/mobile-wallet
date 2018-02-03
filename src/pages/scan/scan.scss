@@ -1,0 +1,35 @@
+page-scan {
+    ion-title > * {  
+        color: color($colors, primary-light) !important;
+    }
+
+    .container {
+        background-color: color($colors, secondary-light) !important;
+    }
+
+    .label {
+        color: color($colors, primary-dark);
+        text-align: center;
+        font-size: 1.3em;
+        font-weight: bold;
+        margin-top: 15%;
+        margin-bottom: 15%;
+    }
+
+    .qrcode {
+        width: 60%;
+        margin: auto;
+        display: block;
+        border-radius: 25%;
+        max-width: 200px;   
+        padding: 5px;
+        border: 5px solid color($colors, primary);
+
+    }
+
+    .qrcode > img {
+        position: relative;
+        left: 10px;
+        top: 10px;
+    }
+}

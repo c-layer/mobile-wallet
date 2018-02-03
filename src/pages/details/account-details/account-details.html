@@ -1,0 +1,37 @@
+<ion-header>
+  <header [colorAttr]="'primary-dark'">
+    {{ title }}
+  </header>
+</ion-header>
+
+
+<ion-content class="container">
+  <div ion-fixed *ngIf="account">
+    <ion-list no-lines>
+      <ion-item item-content class="qrcode">
+        <ngx-qrcode [qrc-value]="account.address" qrc-errorCorrectionLevel="L" qrc-version="5"></ngx-qrcode>
+      </ion-item>
+      <ion-item text-center class="key">{{ account.address }}</ion-item>
+      <div *ngIf="!renaming">
+          <button text-center ion-item (click)="startRename()" block color="primary">Rename</button>
+          <button text-center ion-item disabled=true block>Send To</button>
+          <button text-center ion-item disabled=true block>Share</button>
+          <button text-center ion-item disabled=true block color="danger">Delete</button>
+      </div>
+
+      <div *ngIf="renaming && !loading">
+        <ion-item color="secondary-light">
+          <ion-input #inputName name="inputName" type="text" required [(ngModel)]="name"></ion-input>
+        </ion-item>
+        <ion-item>
+          <button text-center ion-button class="action-danger" (click)="cancelRename()">Cancel</button>
+          <button text-center ion-button class="action-confirm" (click)="rename()">Confirm</button>
+        </ion-item>
+      </div>
+      <div class="loading" *ngIf="loading">
+        <p>Updating ...</p>
+        <ion-spinner name="crescent"></ion-spinner>
+      </div>
+    </ion-list>
+  </div>
+</ion-content>

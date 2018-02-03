@@ -1,0 +1,81 @@
+page-wallet-mnemonic {
+
+    .container {
+        background-color: color($colors, secondary-dark);
+        height: 100%;
+    }
+
+    fieldset {
+        background-color: color($colors, secondary-dark);
+        border: none;
+    }
+    
+    legend {
+        color: color($colors, light);
+        font-weight: bold;
+    }
+
+    .mnemonic {
+        height: 70%;
+    }
+
+    .mnemonic-box {
+        min-height: 70px;
+        background-color: color($colors, secondary-light);
+    }
+    
+    .wordInput {
+        background-color: color($colors, light);
+        color: color($colors, primary-dark);
+        font-weight: bold;
+        margin-top: 3px;
+        display: inline-block;
+    }
+
+    .word {
+        background-color: color($colors, primary-dark);
+        color: color($colors, primary-light);        
+        margin: 6px;
+    }
+
+    .completion {
+        display: inline-block;
+        margin: 5px;
+        text-align: center;
+    }
+
+    .completion > .word {
+        background-color: color($colors, primary-light);
+        color: color($colors, primary-dark);
+    }
+
+    .hint {
+        color: color($colors, primary-light);
+        font: italic;
+        margin: 5px;
+        padding: 0px;
+        align-self: flex-start;
+    }
+
+    .hint-error {
+        color: color($colors, danger);
+        text-align: center;
+        font-style: bold;
+    }
+    
+    .actions {
+        margin-top: 20px;
+    }
+
+    .ion-ios-qrcode:before, 
+    .ion-ios-qrcode-outline:before,
+    .ion-md-qrcode-outline:before,
+    .ion-md-qrcode:before {
+        content: '';
+        background-image: url('../assets/icon/qrcode.png') !important;
+        background-size: 26px 26px;
+        display: inline-block;
+        width: 26px;
+        height: 26px;
+    }
+}

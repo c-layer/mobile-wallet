@@ -1,0 +1,20 @@
+<ion-header>
+  <header [colorAttr]="'secondary-dark'">{{ this.title }}</header>
+</ion-header>
+
+<ion-content padding class="container">
+  <div class="loading" *ngIf="!error">
+    <p>Please wait while your account is 
+      {{ (mode == walletCreationMode.GENERATE) ? 'created' : 'recovered' }}.
+    </p>
+    <p>This can take a minute:</p>
+    <ion-spinner name="crescent"></ion-spinner>
+
+    <p>{{ loadingMessage }}</p>
+  </div>
+  <div class="loading" *ngIf="error">
+    <p>An error was found :</p>
+    <p class="error">{{ error }}</p>
+    <p>Please contact MtWallet team and retry later.</p>
+  </div>
+</ion-content>

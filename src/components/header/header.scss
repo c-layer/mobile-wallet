@@ -1,0 +1,20 @@
+header {
+    .blocknumber > div {
+        font-size: 1.6rem !important;
+        opacity: 1 !important;
+    }
+
+    .newblock {
+        width: 70px;
+        padding-right: 15px;
+    }
+
+    .fadeout {
+   /* -webkit-transition: opacity 1s linear;
+    -moz-transition: opacity 1s linear;
+    -ms-transition: opacity 1s linear;
+    -o-transition: opacity 1s linear;*/
+    transition: .5s ease-in-out all;
+    opacity: 1;
+    }
+}

@@ -1,0 +1,88 @@
+<ion-header>
+  <header [colorAttr]="'primary-dark'">Settings</header>
+</ion-header>
+
+<ion-content class="container">
+  <ion-list lines>
+    <ion-item-divider color="secondary-dark">General</ion-item-divider>
+    <ion-item>
+      <ion-label item-start>
+        Profile
+      </ion-label>
+      <ion-label class="info">
+        Default
+      </ion-label>
+    </ion-item>
+    <ion-item>
+      <ion-label item-start>
+        Network
+      </ion-label>
+      <ion-label item-end class="info">
+        MtPelerin
+      </ion-label>
+    </ion-item>
+    <ion-item>
+      <ion-label item-begin item-start>
+        Node
+      </ion-label>
+      <ion-label class="info">
+        MtPelerin's Public
+      </ion-label>
+    </ion-item>
+    <ion-item>
+      <ion-label item-begin class="info">
+        Version
+      </ion-label>
+      <ion-label class="info">
+        0.1.6
+      </ion-label>
+    </ion-item>
+    <ion-item-divider color="secondary-dark">Security</ion-item-divider>
+    <!--ion-item>
+      <ion-label>Node websocket url:</ion-label>
+      <ion-input type="url" placeholder="Node URL" value="163.172.104.223:1002">
+      </ion-input>
+    </ion-item-->
+    <ion-item no-lines>
+      <button ion-item text-center item-end color="warn" (click)="backupMnemonic()" 
+        *ngIf="!profile.mnemonicIsBackup">
+        <ion-icon name="warning" item-start></ion-icon>
+        Backup Mnemonic
+      </button>
+      <button ion-item text-center item-end color="valid" (click)="backupMnemonic()"
+        *ngIf="profile.mnemonicIsBackup">
+        Backup Mnemonic
+      </button>
+    </ion-item>
+    <!--ion-item no-lines>
+      <button ion-item item-end>
+        Private Keys
+      </button>
+    </ion-item-->
+    <!--ion-item>
+      <ion-label item-start>
+        Confirmations
+        <ion-badge>{{confirmations}}</ion-badge>
+      </ion-label>
+      <ion-range min="1" max="12" step="1" snaps="true" [(ngModel)]="confirmations" color="primary">
+      </ion-range>
+    </ion-item-->
+    <!--ion-item no-lines>
+      <button ion-item color="danger">
+        Offline
+      </button>
+    </ion-item-->
+    <ion-item>
+      <button ion-item no-lines text-center color="danger" (click)="clearData()">
+        Clear All Data 
+        <ion-icon item-end name="alert"></ion-icon>
+      </button>
+    </ion-item>
+    <ion-item-divider color="secondary-dark">Boot time</ion-item-divider>
+    <ion-item *ngFor="let step of loaderProvider.getLoadingSteps()">
+      <ion-label>{{ step.time }} ms</ion-label>
+      <ion-label>{{ step.name }}</ion-label>
+      <ion-label>{{ step.success }}</ion-label>
+    </ion-item>
+  </ion-list>
+</ion-content>

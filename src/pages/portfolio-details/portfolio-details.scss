@@ -1,0 +1,38 @@
+page-portfolio-details {
+    ion-title > *, ion-header ion-icon.back-button-icon.icon {  
+        color: color($colors, primary-light) !important;
+    }
+
+    .container {
+        background-color: color($colors, secondary-light) !important;
+    }
+
+    ion-item {
+        background-color: color($colors, secondary-dark) !important;  
+        color: color($colors, secondary-light) !important;      
+    }
+
+    div.item-inner {
+        border-color: color($colors, secondary) !important;
+    }
+
+    .nohistory { 
+        text-align: center;
+    }
+
+    .positiveAmount {
+        color: color($colors, primary) !important;    
+        width: 50%;
+        display: inline-block;
+    }
+
+    .negativeAmount {
+        color: color($colors, danger) !important;      
+        width: 50%;
+        display: inline-block;
+    }
+
+    .account {
+        display: inline-block;
+    }
+}

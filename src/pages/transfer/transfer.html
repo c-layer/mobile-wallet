@@ -1,0 +1,40 @@
+<ion-header>
+  <header [colorAttr]="'primary-dark'" class="header">Transfer</header>
+</ion-header>
+
+<ion-content padding class="container">
+  <form>
+    <ion-list class="transfer">
+      <ion-item>
+        <ion-label floating>Currency</ion-label>
+        <ion-select name="selectedCurrency" required [(ngModel)]="selectedCurrency">
+          <ion-option *ngFor="let token of getPositivePortfolio()" [value]="token.currency">{{ token.name }}
+          </ion-option>
+        </ion-select>
+      </ion-item>
+      <ion-item>
+        <ion-label floating>Amount in {{ selectedToken.currency.symbol }} (Max {{ selectedToken.balance
+          }} )</ion-label>
+        <ion-input name="selectedAmount" [(ngModel)]="selectedAmount" type="number" max="{{ selectedToken.balance }}"
+          required></ion-input>
+      </ion-item>
+      <ion-item>
+        <ion-label floating>Beneficiary</ion-label>
+        <ion-select name="selectedAccount" required [(ngModel)]="selectedAccount">
+          <ion-option *ngFor="let account of otherAccounts" [value]="account.address">
+            {{ account.name }}
+          </ion-option>
+        </ion-select>
+        <!--button name="scan" class="action" item-end text-center (click)="scan()">
+          Scan
+        </button-->
+      </ion-item>
+    </ion-list>
+    <ion-list>
+      <button ion-item block text-center type="submit" class="action" (click)="transfer()"
+        [disabled]="!selectedCurrency || !selectedAmount || !selectedAccount">
+        Transfer
+      </button>
+    </ion-list>
+  </form>
+</ion-content>

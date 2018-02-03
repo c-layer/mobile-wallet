@@ -1,0 +1,30 @@
+page-settings {
+    ion-title > * {  
+        color: color($colors, primary-light) !important;
+    }
+
+    .container {
+        background-color: color($colors, secondary-light) !important;
+    }
+
+    ion-item {
+        background-color: color($colors, secondary-light) !important;  
+        color: color($colors, secondary-dark) !important;      
+    }
+
+    .info {
+        font-weight: bold;
+    }
+
+    .range-tick {
+        background-color: color($colors, secondary-light) !important;  
+    }
+
+    .range-bar {
+        background-color: color($colors, secondary-dark) !important;
+    }
+
+    .range-bar-active, .range-knob {
+        background-color: color($colors, primary) !important;          
+    }
+}

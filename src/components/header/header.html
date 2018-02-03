@@ -1,0 +1,16 @@
+<ion-navbar [color]="colorAttr">
+  <ion-title start text-left>
+    <ng-content></ng-content>
+  </ion-title>
+  <ion-buttons end>
+    <ion-badge item-end color="primary" *ngIf="createdTxs > 0">{{ createdTxs }} created</ion-badge>
+    <ion-badge item-end color="light" *ngIf="pendingTxs > 0">{{ pendingTxs }} pending</ion-badge>
+    <ion-badge item-end color="warn" *ngIf="unconfirmedTxs > 0">{{ unconfirmedTxs }} unconfirmed</ion-badge>
+  </ion-buttons>
+  <ion-buttons end>
+    <ion-title class="blocknumber" *ngIf="notificationsProvider.hasNewBlock()">
+      {{ notificationsProvider.getBlockNumber() }}
+    </ion-title>
+    <img class="newblock" *ngIf="!notificationsProvider.hasNewBlock()" src="assets/imgs/blockchain.png">
+  </ion-buttons>
+</ion-navbar>

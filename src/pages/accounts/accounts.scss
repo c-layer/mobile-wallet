@@ -1,0 +1,36 @@
+page-accounts {
+    ion-title > * {  
+        color: color($colors, primary-light) !important;
+    }
+
+    .container {
+        background-color: color($colors, secondary-light) !important;
+    }
+
+    ion-item.header {
+        background-color: color($colors, secondary-light) !important;        
+    }
+
+    ion-item-divider {
+        background-color: color($colors, secondary-dark) !important;
+        color: color($colors, secondary-light) !important;
+    }
+
+    .account {
+        background-color: color($colors, secondary-light) !important;
+        color: color($colors, secondary-dark) !important;
+    }
+
+    .account.account-active {
+        background-color: color($colors, light) !important;        
+        color: color($colors, dark) !important;
+    }
+
+    div.item-inner {
+        border-color: color($colors, dark) !important;
+    }
+
+    .account-name {
+        font-weight: bold;
+    }
+}

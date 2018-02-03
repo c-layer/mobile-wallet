@@ -1,0 +1,76 @@
+<ion-header>
+  <header [colorAttr]="'secondary-dark'">{{ title }}</header>
+</ion-header>
+
+<ion-content padding class="container">
+  <div *ngIf="mode==walletMnemonicMode.RECOVER">
+    <fieldset class="mnemonic">
+      <legend>Please provide below the 12 mnemonic words used for your backup</legend>
+      <hr/>
+      <!--ion-input name="passphrase" class="wordInput" placeholder="optional passphrase"></ion-input>
+      <hr/-->
+      <ion-input name="wordInput" class="wordInput" placeholder="mnemonic words" (input)="validateWord($event)"
+        [disabled]="mnemonic.length == 12" (keypress)="($event.keyCode == 13) ? addToMnemonic(wordInput): $event"
+        type="text" [(ngModel)]="wordInput"></ion-input>
+      <div class="mnemonic-box">
+        <ion-badge class="word" (click)="removeFromMnemonic(word)" *ngFor="let word of mnemonic">{{ word }}</ion-badge>
+      </div>
+      <p class="hint" *ngIf="mnemonic.length > 0">Click on words to delete them</p>
+      <p class="hint" *ngIf="mnemonic.length != 12">The mnemonic should have 12 words. Still {{ 12 -mnemonic.length }} missing.</p>
+      <div class="completion">
+        <ion-badge class="word" (click)="addToMnemonic(word)" *ngFor="let word of hintWords">{{ word }}</ion-badge>
+      </div>
+      <p class="hint hint-error" *ngIf="mnemonic.length == 12 && !isValid()">The list of words is invalid</p>
+      <button ion-button full [disabled]="!isValid()" (click)="proceed()" class="actions">Recover</button>
+    </fieldset>
+  </div>
+  <div *ngIf="(mode == walletMnemonicMode.GENERATE) && !backingUp">
+    <fieldset class="mnemonic">
+      <legend>The 12 mnemonic words below are to be used for your backup:</legend>
+      <hr/>
+      <div class="mnemonic-box">
+        <ion-badge class="word" *ngFor="let word of mnemonic">{{ word }}</ion-badge>
+      </div>
+      <button ion-button full (click)="backup()" class="actions">Backup Now !</button>
+      <button ion-button full (click)="proceed()" class="actions" 
+        *ngIf="mode==walletMnemonicMode.GENERATE"
+        outline>Proceeed anyway and backup later !</button>
+    </fieldset>
+  </div>
+  <div *ngIf="mode == walletMnemonicMode.BACKUP || ((mode == walletMnemonicMode.GENERATE) && backingUp)">
+      <fieldset class="mnemonic" *ngIf="!memorizing">
+        <legend>The 12 mnemonic words below are to be used for your backup:</legend>
+        <hr/>
+        <div class="mnemonic-box">
+          <ion-badge class="word" *ngFor="let word of mnemonic">{{ word }}</ion-badge>
+        </div>
+        <br/>
+        <p class="hint">These words are the only way that you will have to recovery your money</p>
+        <p class="hint">You do want to memorize these words.</p>
+        <p class="hint">A good practice is to start with writing these words on a paper and keep it in a safe place !</p>
+        <br/>
+        <p class="hint">You will be asked now to give back the words in the same order. Click 'start'  when you are ready.</p>
+
+        <button ion-button full (click)="memorize()" class="actions">start</button>
+        <button ion-button full (click)="proceed()" class="actions" 
+        *ngIf="mode==walletMnemonicMode.GENERATE"
+        outline>backup later !</button>
+      </fieldset>
+      <fieldset class="mnemonic" *ngIf="memorizing">
+        <ion-input class="wordInput" placeholder="1st word" type="text" [(ngModel)]="wordInput1"></ion-input>
+        <ion-input class="wordInput" placeholder="2nd word" type="text" [(ngModel)]="wordInput2"></ion-input>
+        <ion-input class="wordInput" placeholder="3rd word" type="text" [(ngModel)]="wordInput3"></ion-input>
+        <ion-input class="wordInput" placeholder="4th word" type="text" [(ngModel)]="wordInput4"></ion-input>
+        <ion-input class="wordInput" placeholder="5th word" type="text" [(ngModel)]="wordInput5"></ion-input>
+        <ion-input class="wordInput" placeholder="6th word" type="text" [(ngModel)]="wordInput6"></ion-input>
+        <ion-input class="wordInput" placeholder="7th word" type="text" [(ngModel)]="wordInput7"></ion-input>
+        <ion-input class="wordInput" placeholder="8th word" type="text" [(ngModel)]="wordInput8"></ion-input>
+        <ion-input class="wordInput" placeholder="9th word" type="text" [(ngModel)]="wordInput9"></ion-input>
+        <ion-input class="wordInput" placeholder="10th word" type="text" [(ngModel)]="wordInput10"></ion-input>
+        <ion-input class="wordInput" placeholder="11th word" type="text" [(ngModel)]="wordInput11"></ion-input>
+        <ion-input class="wordInput" placeholder="12th word" type="text" [(ngModel)]="wordInput12"></ion-input>
+        <button ion-button full (click)="confirm()" class="actions"
+        [disabled]="!isMemorized()">confirm</button>
+      </fieldset>
+    </div>
+  </ion-content>

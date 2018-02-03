@@ -1,0 +1,95 @@
+<ion-header>
+  <header [colorAttr]="'secondary-dark'">{{ title }}</header>
+</ion-header>
+
+<ion-content padding class="container">
+  <div *ngIf="mode==walletSecureMode.CREATE">
+    <form>
+      <ion-list>
+        <ion-item>
+          <ion-label floating>Enter a password</ion-label>
+          <ion-input #inputPassword name="inputPassword" [type]="inputPasswordType" required
+            [(ngModel)]="password"></ion-input>
+          <button name="passwordEye" item-end ion-button icon-only clear (mousedown)="showInput('password', $event)"
+            (mouseup)="showInput('password', $event)" (touchstart)="showInput('password', $event)"
+            (touchend)="showInput('password', $event)">
+            <ion-icon name="eye"></ion-icon>
+          </button>
+        </ion-item>
+        <ion-item no-lines>
+          <ion-label class="hint">password must be at least 7 characters long</ion-label>
+        </ion-item>
+        <ion-item>
+          <ion-label floating>Confirm it</ion-label>
+          <ion-input #inputConfirmation name="inputConfirmation" [type]="inputConfirmationType"
+            required [(ngModel)]="confirmation"></ion-input>
+          <button name="confirmationEye" item-end ion-button icon-only clear (mousedown)="showInput('confirmation', $event)"
+            (mouseup)="showInput('confirmation', $event)" (touchstart)="showInput('confirmation', $event)"
+            (touchend)="showInput('confirmation', $event)">
+            <ion-icon name="eye"></ion-icon>
+          </button>
+        </ion-item>
+        <ion-item no-lines>
+          <div class="reminder">
+            <p>It is very important that you remind it !</p>
+            <p>As there will be no possible recovery options.</p>
+          </div>
+        </ion-item>
+        <ion-item no-lines>
+          <button ion-button full class="next" type="submit" (click)="submit()" color="primary"
+            [disabled]="!confirmation || confirmation.lenght > 7 || password!=confirmation">Next</button>
+        </ion-item>
+      </ion-list>
+    </form>
+  </div>
+  <div *ngIf="[walletSecureMode.UNLOCK,walletSecureMode.ELEVATE_PRIVS].indexOf(mode)>=0">
+    <form>
+      <ion-list>
+        <ion-item no-lines>
+          <div *ngIf="mode==walletSecureMode.UNLOCK">
+            <h2>You are going to unlock your wallet.</h2>
+          </div>
+          <div *ngIf="mode==walletSecureMode.ELEVATE_PRIVS">
+            <h2>Your operation need to be confirmed.</h2>
+          </div>
+          <h2>Be sure to do this when no one is looking at your screen !</h2>
+        </ion-item>
+        <ion-item>
+          <ion-label floating>Enter a password</ion-label>
+          <ion-input #inputPassword name="inputPassword" [type]="inputPasswordType" required
+            [(ngModel)]="password"></ion-input>
+          <button name="passwordEye" item-end ion-button icon-only clear (mousedown)="showInput('password', $event)"
+            (mouseup)="showInput('password', $event)" (touchstart)="showInput('password', $event)"
+            (touchend)="showInput('password', $event)">
+            <ion-icon name="eye"></ion-icon>
+          </button>
+        </ion-item>
+        <ion-item no-lines>
+          <ion-label class="unlock-warn">
+            <div *ngIf="invalidPassword">The password was invalid !</div>
+          </ion-label>
+        </ion-item>
+        <ion-item no-lines *ngIf="mode==walletSecureMode.UNLOCK">
+          <div *ngIf="!unlocking">
+            <button ion-button full class="next" type="submit" (click)="unlock()" color="primary"
+              [disabled]="!password">Unlock</button>
+          </div>
+          <div *ngIf="unlocking" class="loading">
+            <p>Unlocking</p>
+            <ion-spinner name="crescent"></ion-spinner>
+          </div>
+        </ion-item>
+        <ion-item no-lines *ngIf="mode==walletSecureMode.ELEVATE_PRIVS">
+          <div *ngIf="!unlocking">
+            <button ion-button full class="next" type="submit" (click)="elevatePrivileges()" color="primary"
+              [disabled]="!password">Authorize</button>
+          </div>
+          <div *ngIf="unlocking" class="loading">
+            <p>Processing</p>
+            <ion-spinner name="crescent"></ion-spinner>
+          </div>
+        </ion-item>
+      </ion-list>
+    </form>
+  </div>
+</ion-content>

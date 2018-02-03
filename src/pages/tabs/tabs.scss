@@ -1,0 +1,50 @@
+page-tabs {      
+
+    .ion-ios-wallet:before, 
+    .ion-ios-wallet-outline:before,
+    .ion-md-wallet-outline:before,
+    .ion-md-wallet:before {
+        content: '';
+        background-image: url('../assets/icon/wallet.png') !important;
+        background-size: 26px 20px;
+        display: inline-block;
+        width: 26px;
+        height: 20px;
+    }
+
+    .ion-ios-settings:before, 
+    .ion-ios-settings-outline:before,
+    .ion-md-settings-outline:before,
+    .ion-md-settings:before {
+        content: '';
+        background-image: url('../assets/icon/settings.png') !important;
+        background-size: 30px 24px;
+        display: inline-block;
+        width: 30px;
+        height: 24px;
+    }
+
+    .ion-ios-qrcode:before, 
+    .ion-ios-qrcode-outline:before,
+    .ion-md-qrcode-outline:before,
+    .ion-md-qrcode:before {
+        content: '';
+        background-image: url('../assets/icon/qrcode.png') !important;
+        background-size: 26px 26px;
+        display: inline-block;
+        width: 26px;
+        height: 26px;
+    }
+
+    .ion-ios-people:before, 
+    .ion-ios-people-outline:before,
+    .ion-md-people-outline:before,
+    .ion-md-people:before {
+        content: '';
+        background-image: url('../assets/icon/people.png') !important;
+        background-size: 26px 26px;
+        display: inline-block;
+        width: 26px;
+        height: 26px;
+    }
+}
