@@ -17,18 +17,31 @@ export class ProfileProvider {
                 .then(profile => {
 
                     // FIX 0.1.7
-                    if(typeof(profile.mnemonicIsBackup) != "boolean") {
+                    let tobeSaved = false;
+                    if (typeof (profile.mnemonicIsBackup) != "boolean") {
                         profile.mnemonicIsBackup = false;
+                        tobeSaved = true;
+                    }
+                    if (!profile.tokens || profile.tokens.length < 2) {
+                        profile.tokens = {
+                            'ETH': ['0x73b10223b2318cfb775fbe7bc5781a04c2a0a3cd'],
+                            'RSK': ['0x347e70673323bbde4772af6fbbecf7caef084205']
+                        }
+                        tobeSaved = true;
                     }
 
                     this.profile = profile;
-                    return profile;
+                    if (tobeSaved) {
+                        return this.saveProfile();
+                    } else {
+                        return profile;
+                    }
                 }));
     }
 
     public isProfileConsistent(): boolean {
         return this.profile.name
-            && this.profile.tokenDirectories
+            && this.profile.tokens
             && this.profile.accounts
             && this.profile.encryptedMnemonic
             && this.profile.derivationUsed
@@ -43,8 +56,8 @@ export class ProfileProvider {
         return Observable.fromPromise(this.storage.set(ProfileProvider.STORAGE_KEY, this.profile)
             .then(() => {
                 console.log('profile saved !');
-            return this.profile;
-        }));
+                return this.profile;
+            }));
     }
 
     public clearProfile(): Observable<void> {
@@ -62,13 +75,11 @@ export class ProfileProvider {
         this.profile.name = 'default';
         this.profile.accounts = (params.accounts) ? params.accounts : [];
         this.profile.encryptedWallet = (params.encryptedWallet) ? params.encryptedWallet : [];
-        this.profile.tokenDirectories = (params.tokenDirectories) ? params.tokenDirectories : [];
         this.profile.mnemonicIsBackup = (params.mnemonicIsBackup) ? params.mnemonicIsBackup : false;
         return this.saveProfile();
     }
 
     public setTokenDirectories(tokenDirectories: Array<string>) {
-        this.profile.tokenDirectories = tokenDirectories;
         return this.saveProfile();
     }
 
@@ -91,6 +102,11 @@ export class ProfileProvider {
 
     public setMnemonicIsBackUp() {
         this.profile.mnemonicIsBackup = true;
+        return this.saveProfile();
+    }
+
+    public setSettings(settings: any) {
+        this.profile.settings = settings;
         return this.saveProfile();
     }
 }

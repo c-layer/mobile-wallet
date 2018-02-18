@@ -29,11 +29,11 @@ export class CurrencyProvider {
     return null;
   }
 
-  public getCurrencyBySymbol(symbol: string): Currency {
+  public getCurrencyBySymbol(network: string, symbol: string): Currency {
     let found = null;
     if (this.currencies) {
       this.currencies.forEach(currency => {
-        if (currency.symbol == symbol) {
+        if (currency.symbol == symbol && currency.network == network) {
           found = currency;
         }
       });
@@ -42,143 +42,159 @@ export class CurrencyProvider {
   }
 
   public portfolioObs(account: Account): Observable<AccountToken[]> {
-    if (!account || !account.address) {
-      return Observable.of([]);
-    }
-
     return this.allCurrenciesObs().flatMap(currencies => {
       if (currencies.length == 0) return Observable.of([]);
       return Observable.forkJoin(currencies.map(currency => {
-
-        let blockNumber = this.web3Provider.getLatestBlockNumber();
         if (currency.contract == null) {
           return currency.balanceOf(account).map((balance) =>
             <AccountToken>{
               currency: currency.symbol,
               image: currency.image,
+              network: null,
               name: currency.name,
               balance: balance,
-              untilBlock: blockNumber,
+              untilBlock: null,
               transactions: []
             }
           );
+        } else {
+          return currency.balanceOf(account).map(balance => {
+            let transactions = [];
+            currency.contract.events.Transfer({
+              fromBlock: 0,
+              //   toBlock: null,
+              topics: [null, this.web3Provider.encodeAddress(account.address), null]
+            }).subscribe((error, data) => {
+              if (data) {
+                transactions.push(data);
+              }
+            });
+            currency.contract.events.Transfer({
+              fromBlock: 0,
+              //   toBlock: null,
+              topics: [null, null, this.web3Provider.encodeAddress(account.address)]
+            }).subscribe((error, data) => {
+              if (data) {
+                transactions.push(data);
+              }
+            });
+            return <AccountToken>{
+              currency: currency.symbol,
+              image: currency.image,
+              name: currency.name,
+              network: currency.network,
+              balance: balance,
+              untilBlock: null,
+              transactions: transactions
+            };
+          });
         }
-        return currency.balanceOf(account).map(balance => {
-          let transactions = [];
-          currency.contract.events.Transfer({
-            fromBlock: 0,
-            toBlock: blockNumber,
-            topics: [null, this.web3Provider.encodeAddress(account.address), null]
-          }).subscribe((error, data) => {
-            if (data) {
-              transactions.push(data);
-            }
-          });
-          currency.contract.events.Transfer({
-            fromBlock: 0,
-            toBlock: blockNumber,
-            topics: [null, null, this.web3Provider.encodeAddress(account.address)]
-          }).subscribe((error, data) => {
-            if (data) {
-              transactions.push(data);
-            }
-          });
-          return <AccountToken>{
-            currency: currency.symbol,
-            image: currency.image,
-            name: currency.name,
-            balance: balance,
-            untilBlock: blockNumber,
-            transactions: transactions
-          };
+      }));
+    });
+  }
+
+  private getCoreCurrency(web3, name, symbol, image): Promise<Currency> {
+    return Promise.resolve({
+      name: name, decimal: null, network: null,
+      address: null, contract: null, supply: null, symbol: symbol,
+      image: image,
+      balanceOf: (account: Account) => Observable.fromPromise(Promise.resolve(account)
+        .then(account => web3.eth.getBalance(account.address)
+          .then(balance => web3.utils.fromWei(balance, 'ether')))),
+      transfer: function (sender: Account, password: string,
+        beneficiaryAddress: string, amount: number) {
+        let value = this.web3Provider.getUtils().toWei(amount, 'ether');
+        let result = this.accountProvider.getPrivateKey(sender, password).flatMap(privateKey =>
+          this.web3Provider.sendSignedTransaction(web3,
+            sender.address, privateKey, beneficiaryAddress, value, null));
+        let eth = sender.portfolio[0];
+        eth.transactions.push({
+          returnValues: {
+            value: value, from: sender.address, to: beneficiaryAddress
+          }
         });
-      })
-      )
+        return result;
+      }
+    });
+  }
+
+  private getDirectory(network, web3, directoryAddress): Promise<Currency>[] {
+    let directory = new web3.eth.Contract(MtPelerinTokens.abi, directoryAddress);
+    return directory.methods.getCurrencyCount().call().then(count => {
+      let tokens = [];
+      for (var i = 1; i <= count; i++) {
+        let token: Promise<Currency> = directory.methods.getCurrencyById(i).call().then(address => {
+          let contract = new web3.eth.Contract(FiatToken.abi, address);
+          if (contract) {
+            let methods = contract.methods;
+            return Promise.all([
+              methods.name().call(),
+              methods.symbol().call()
+                .then(symbol => web3.utils.toAscii(symbol)),
+              methods.totalSupply().call(),
+            ]).then(details => <Currency>{
+              name: details[0],
+              decimal: 2,
+              network: network,
+              address: address,
+              contract: contract,
+              supply: details[2],
+              symbol: details[1],
+              image: 'assets/imgs/currencies/MTPELERIN.svg',
+              balanceOf: (account: Account) =>
+                Observable.fromPromise(Promise.resolve(account)
+                  .then(account => contract.methods.balanceOf(account.address).call())
+                  .then((balance: number) => (balance) ? balance / 100 : 0)),
+              transfer: function (sender: Account, password: string, beneficiaryAddress: string, amount: number) {
+                console.log(amount + ' ' + this.symbol + ' to ' + beneficiaryAddress);
+                let cents = amount * (10 ** this.decimal);
+                let contractData = methods.transfer(beneficiaryAddress, cents).encodeABI();
+                return this.accountProvider.getPrivateKey(sender, password).flatMap(privateKey =>
+                  this.web3Provider.sendSignedTransaction(web3,
+                    sender.address, privateKey, address, null, contractData));
+              }
+            });
+          } else {
+            return null;
+          }
+        });
+        tokens.push(token);
+      }
+      return tokens;
     });
   }
 
   public allCurrenciesObs(): Observable<Array<Currency>> {
+    let rskDirectories = this.profileProvider.getProfile().tokens['RSK'];
+    let ethDirectories = this.profileProvider.getProfile().tokens['ETH'];
 
-    return this.web3Provider.whenReady().flatMap(() => {
-      let web3Provider = this.web3Provider;
-      let accountProvider = this.accountProvider;
-      let profile = this.profileProvider.getProfile();
-      let ether: Promise<Currency> = Promise.resolve({
-        name: 'Ethereum', decimal: null,
-        address: null, contract: null, supply: null, symbol: 'ETH',
-        image: 'assets/imgs/currencies/ETHER.svg',
-        balanceOf: (account: Account) => Observable.fromPromise(Promise.resolve(account)
-          .then(account => web3Provider.getBalance(account.address)
-            .then(balance => web3Provider.getUtils().fromWei(balance, 'ether')))),
-        transfer: function (sender: Account, password: string, beneficiaryAddress: string, amount: number) {
-          let value = web3Provider.getUtils().toWei(amount, 'ether');
-          let result = accountProvider.getPrivateKey(sender, password).flatMap(privateKey =>
-            web3Provider.sendSignedTransaction(
-              sender.address, privateKey, beneficiaryAddress, value, null));
-          let eth = sender.portfolio[0];
-          eth.transactions.push({
-            returnValues: {
-              value: value, from: sender.address, to: beneficiaryAddress
-            }
-          });
-          return result;
-        }
-      });
+    let currenciesPromises = Promise.all([]
+      .concat(ethDirectories.map(directory =>
+        this.getDirectory('ETH', this.web3Provider.getEthProvider(), directory)))
+      .concat(rskDirectories.map(directory =>
+        this.getDirectory('RSK', this.web3Provider.getRskProvider(), directory)))
+    ).then(data => {
+      let tokens = [
+        this.getCoreCurrency(this.web3Provider.getRskProvider(), 
+          'SmartBTC', 'SBTC', 'assets/imgs/currencies/RSK.png'),
+        this.getCoreCurrency(this.web3Provider.getEthProvider(), 
+          'Ethereum', 'ETH', 'assets/imgs/currencies/ETHER.svg')
+      ];
 
-      let directoryPromise: Promise<Currency[]> = Promise.resolve([]);
-      if (profile && profile.tokenDirectories && profile.tokenDirectories.length > 0) {
-        let tokenDirectory = web3Provider.getContract(MtPelerinTokens.abi, profile.tokenDirectories[0]);
-        if (tokenDirectory) {
-          directoryPromise = tokenDirectory.methods.getCurrencyCount().call().then(count => {
-            let directoryTokens = [ether];
-            for (var i = 1; i <= count; i++) {
-              let token: Promise<Currency> = tokenDirectory.methods.getCurrencyById(i).call().then(address => {
-                let contract = web3Provider.getContract(FiatToken.abi, address);
-                if (contract) {
-                  let methods = contract.methods;
-                  return Promise.all([
-                    methods.name().call(),
-                    methods.symbol().call()
-                      .then(symbol => web3Provider.getUtils().toAscii(symbol)),
-                    methods.totalSupply().call(),
-                  ]).then(details => <Currency>{
-                    name: details[0],
-                    decimal: 2,
-                    address: address,
-                    contract: contract,
-                    supply: details[2],
-                    symbol: details[1],
-                    image: 'assets/imgs/currencies/MTPELERIN.svg',
-                    balanceOf: (account: Account) =>
-                      Observable.fromPromise(Promise.resolve(account)
-                        .then(account => contract.methods.balanceOf(account.address).call())
-                        .then((balance: number) => (balance) ? balance / 100 : 0)),
-                    transfer: function (sender: Account, password: string, beneficiaryAddress: string, amount: number) {
-                      console.log(amount + ' ' + this.symbol + ' to ' + beneficiaryAddress);
-                      let cents = amount * (10 ** this.decimal);
-                      let contractData = methods.transfer(beneficiaryAddress, cents).encodeABI();
-                      return accountProvider.getPrivateKey(sender, password).flatMap(privateKey =>
-                        web3Provider.sendSignedTransaction(
-                          sender.address, privateKey, address, null, contractData));
-                    }
-                  });
-                } else {
-                  return null;
-                }
-              });
-              directoryTokens.push(token);
-            }
-            return Promise.all(directoryTokens).then(currencies => {
-              this.currencies = currencies.filter(currency => (currency != null));
-              return currencies;
-            });
-          });
-        };
-      };
-
-      return Observable.fromPromise(
-        directoryPromise
-      );
+      if(data[0]) {
+        tokens = tokens.concat(data[0]);
+      }
+      if(data[1]) {
+        tokens = tokens.concat(data[1])
+      }
+      
+      return Promise.all(tokens);
     });
+
+    currenciesPromises.then(currencies => {
+      this.currencies = currencies;
+    })
+
+    return Observable.fromPromise(currenciesPromises);
   }
 }

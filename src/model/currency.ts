@@ -4,6 +4,7 @@ import { Observable } from 'rxjs/Observable';
 
 export class Currency {
   name: string;
+  network: string;
   decimal: number;
   address: string;
   contract: any;

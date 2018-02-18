@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='utf-8'?>
-<widget id="tech.smex.mtpelerin.wallet" version="0.1.7" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
+<widget id="tech.smex.mtpelerin.wallet" version="0.1.8" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
     <name>mtwallet</name>
     <description>mtwallet</description>
     <author email="cyril.lapinte@gmail.com" href="https://github.com/MtPelerin/mtwallet">Cyril Lapinte</author>

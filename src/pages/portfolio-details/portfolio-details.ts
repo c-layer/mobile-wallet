@@ -26,8 +26,8 @@ export class PortfolioDetailsPage {
     public navCtrl: NavController, public navParams: NavParams) {
   }
 
-  activeAccountCanSend(currency) {
-    return this.accountProvider.accountCanSend(this.activeAccount, currency);
+  activeAccountCanSend(token) {
+    return this.accountProvider.accountCanSend(this.activeAccount, token.network, token.currency);
   }
 
   startTransfer(token, event: FocusEvent) {
@@ -38,20 +38,20 @@ export class PortfolioDetailsPage {
   ionViewWillEnter() {
     this.activeAccount = this.accountProvider.getActiveAccount();
     this.token = this.navParams.get('token');
-    this.currency = this.currencyProvider.getCurrencyBySymbol(this.token.currency);
-    if(this.currency && this.currency.supply != undefined) {
-      this.supply = this.currency.supply / 10** this.currency.decimal;
+    this.currency = this.currencyProvider.getCurrencyBySymbol(this.token.network, this.token.currency);
+    if (this.currency && this.currency.supply != undefined) {
+      this.supply = this.currency.supply / 10 ** this.currency.decimal;
     }
 
     this.history = this.token.transactions.map(transaction => {
       let values = transaction.returnValues;
-      let from = (values.from == this.activeAccount.address) ? null: 
+      let from = (values.from == this.activeAccount.address) ? null :
         this.accountProvider.getAccountName(values.from);
-      let to = (values.to == this.activeAccount.address) ? null: 
+      let to = (values.to == this.activeAccount.address) ? null :
         this.accountProvider.getAccountName(values.to);
 
       let amount = values.value / 10 ** this.currency.decimal;
-      if(this.token.currency == 'ETH') {
+      if (this.token.currency == 'ETH') {
         amount = values.value;
       }
       return <Transaction>{
@@ -65,5 +65,9 @@ export class PortfolioDetailsPage {
       if (a.blockNumber > b.blockNumber) return 1;
       return 0;
     }).reverse();
+  }
+
+  ionViewDidLeave() {
+    this.navCtrl.popToRoot();
   }
 }

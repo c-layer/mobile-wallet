@@ -3,9 +3,10 @@ import { Account } from '../model/account';
 export class Profile {
   name: string;
   selected: boolean;
-  settings: {};
+  settings: {  };
 
-  tokenDirectories: Array<string>;
+  tokens: {  };
+
   accounts: Array<Account>;
   encryptedMnemonic: any;
   mnemonicIsBackup: boolean;

@@ -15,7 +15,7 @@
           {{formatProvider.formatAmount(supply) }} {{token.currency}}
         </ion-label>
       </ion-item>
-      <button ion-button icon-end solid block *ngIf="activeAccountCanSend(token.currency)"
+      <button ion-button icon-end solid block *ngIf="activeAccountCanSend(token)"
           (click)="startTransfer(token, $event)">
           Send
           <ion-icon name="card"></ion-icon>

@@ -24,7 +24,7 @@ export class PortfolioPage {
   }
 
   activeAccountCanSend(token) {
-    return this.accountProvider.accountCanSend(this.activeAccount, token.currency);
+    return this.accountProvider.accountCanSend(this.activeAccount, token.network, token.currency);
   }
 
   activeAccountBalance(token) {
@@ -40,8 +40,34 @@ export class PortfolioPage {
     this.navCtrl.push(PortfolioDetailsPage, { token: token });
   }
 
+  getCore() {
+    return this.activeAccount.portfolio.filter(item => (item.network == null))
+  }
+
+  getTokens(network) {
+    return this.activeAccount.portfolio.filter(item => (item.network == network))
+  }
+
+  doRefresh(refresher) {
+    if (this.activeAccount) {
+      this.loaderProvider.startWeb3();
+      this.portfolioSubscription = this.currencyProvider.portfolioObs(this.activeAccount)
+        .first().subscribe(data => {
+          if (data.length > 0) {
+            this.loaderProvider.setStatus('PortfolioLoaded');
+            this.loaderProvider.endStart();
+            this.activeAccount.portfolio = data;
+          }
+          if(refresher) {
+            refresher.complete();
+          }
+        });
+    }
+  }
+
   ionViewWillEnter() {
     this.activeAccount = this.accountProvider.getActiveAccount();
+    this.loaderProvider.setStatus('PortfolioStart');
     if (!this.activeAccount) {
       this.navCtrl.parent.select(1);
       return;
@@ -49,14 +75,7 @@ export class PortfolioPage {
   }
 
   ionViewDidEnter() {
-    if (this.activeAccount) {
-      this.loaderProvider.startWeb3();
-      this.portfolioSubscription = this.currencyProvider.portfolioObs(this.activeAccount).first().subscribe(data => {
-        if (data.length > 0) {
-          this.activeAccount.portfolio = data;
-        }
-      });
-    }
+    this.doRefresh(null);
   }
 
   ionViewWillLeave() {

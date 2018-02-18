@@ -4,7 +4,6 @@ import { CurrencyProvider } from '../../providers/currency';
 import { NavController, NavParams } from 'ionic-angular';
 import { AccountProvider } from '../../providers/account';
 import { WalletSecureMode, WalletSecurePage } from '../wallet/wallet-secure/wallet-secure';
-import { Transaction } from '../../model/transaction';
 import { AccountToken } from '../../model/account-token';
 
 @Component({
@@ -36,7 +35,8 @@ export class TransferPage {
   }
 
   public transfer() {
-    let currency = this.currencyProvider.getCurrencyBySymbol(this.selectedCurrency);
+    let currency = this.currencyProvider.getCurrencyBySymbol(this.selectedToken.network, 
+      this.selectedCurrency);
     this.navCtrl.push(WalletSecurePage, {
       mode: WalletSecureMode.ELEVATE_PRIVS,
       callback: (password) => {

@@ -57,4 +57,8 @@ export class AccountDetailsPage {
     this.name = this.account.name;
     this.title = this.account.name;
   }
+
+  ionViewDidLeave() {
+    this.navCtrl.popToRoot();
+  }
 }

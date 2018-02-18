@@ -22,12 +22,12 @@ page-accounts {
     }
 
     .account.account-active {
-        background-color: color($colors, light) !important;        
-        color: color($colors, dark) !important;
+        background-color: color($colors, primary-light) !important;
+        color: color($colors, primary-dark) !important;
     }
 
     div.item-inner {
-        border-color: color($colors, dark) !important;
+        border-color: color($colors, primary-dark) !important;
     }
 
     .account-name {

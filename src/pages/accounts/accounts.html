@@ -26,7 +26,7 @@
         <ion-icon name="person" item-start></ion-icon>
         <h2 class="account-name">{{account.name}}</h2>
         <ion-icon *ngIf="hasPrivateKey(account)" name="key" item-end></ion-icon>
-        <button ion-button item-end class="action" (click)="goToDetailsPage($event, account)">
+        <button ion-button item-end class="action qrcode" (click)="goToDetailsPage($event, account)">
           QRCode
         </button>
       </button>  

@@ -40,13 +40,15 @@ export class LoaderProvider {
         return this.status;
     }
 
+    public endStart() {
+        this.setStatus('Boot finished !')
+        this.endTime = new Date().getTime();
+    }
+
     public startWeb3() {
         this.notificationsProvider.start();
         this.web3Provider.start();
         this.setStatus('web3Loaded');
-
-        this.setStatus('Boot finished !')
-        this.endTime = new Date().getTime();
     }
 
     public start() {
@@ -62,7 +64,6 @@ export class LoaderProvider {
                 this.accountProvider.loadAccounts();
                 this.setStatus('appReady', false, true, 'application is ready !');
                 result = Observable.of(profile);
-                //accountProvider.addAccount( '0x2b509a3f22fcf5890ce908d49ba20520c9cedc458180148b8fd597060664651', '1234567', 'Tester');
             } else {
                 this.setStatus('profileInConsistent', false, false, 'No profile found !');
             }
