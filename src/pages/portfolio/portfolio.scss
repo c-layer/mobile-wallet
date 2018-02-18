@@ -19,4 +19,9 @@ page-portfolio {
     .token-svg {
         width: 40px;
     }
+
+    ion-item-divider {
+        background-color: color($colors, secondary-dark) !important;
+        color: color($colors, secondary-light) !important;
+    }
 }

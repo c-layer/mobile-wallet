@@ -6,7 +6,7 @@ page-portfolio-details {
     .container {
         background-color: color($colors, secondary-light) !important;
     }
-
+    
     ion-item {
         background-color: color($colors, secondary-dark) !important;  
         color: color($colors, secondary-light) !important;      
@@ -20,19 +20,36 @@ page-portfolio-details {
         text-align: center;
     }
 
+    .progress {
+        text-align: center;
+    }
+
+    .errors {
+        text-align: center;
+        color: color($colors, danger) !important;
+    }
+
+    .balance {
+        font: 30px bold;
+        top: -20px;
+        position: absolute;
+        right: 0px;
+    }
+
     .positiveAmount {
         color: color($colors, primary) !important;    
-        width: 50%;
+        width: 40%;
         display: inline-block;
     }
 
     .negativeAmount {
         color: color($colors, danger) !important;      
-        width: 50%;
+        width: 40%;
         display: inline-block;
     }
 
     .account {
         display: inline-block;
+        text-align: right;
     }
 }

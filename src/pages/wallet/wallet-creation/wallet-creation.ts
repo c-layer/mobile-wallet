@@ -28,7 +28,10 @@ export class WalletCreationPage {
   private passphrase: string;
   private mnemonicIsBackup: string;
 
-  private tokenDirectories: Array<string> = ['0x73b10223b2318cfb775fbe7bc5781a04c2a0a3cd'];
+  private tokenDirectories: Array<string> = [
+    '0x73b10223b2318cfb775fbe7bc5781a04c2a0a3cd',
+    '0x347e70673323bbde4772af6fbbecf7caef084205'
+  ];
 
   constructor(private profileProvider: ProfileProvider,
     private accountProvider: AccountProvider,

@@ -4,6 +4,7 @@ import { FormatProvider } from '../../../providers/format';
 import { TransferPage } from "../../transfer/transfer";
 import { Account } from '../../../model/account';
 import { AccountProvider } from '../../../providers/account';
+import { WalletSecurePage, WalletSecureMode } from '../../wallet/wallet-secure/wallet-secure';
 
 @Component({
   selector: 'page-account-details',
@@ -52,9 +53,33 @@ export class AccountDetailsPage {
     this.renaming = false;
   }
 
+  accountCanSend() {
+    let active = this.accountProvider.getActiveAccount();
+    return this.account != active
+      && this.accountProvider.accountCanSend(active);
+  }
+
+  delete() {
+    this.navCtrl.parent.parent.push(WalletSecurePage, { 
+      mode: WalletSecureMode.ELEVATE_PRIVS,
+      callback: (password) => {
+        let profile = this.accountProvider.removeAccount(this.account, password);
+        this.navCtrl.remove(1);
+        return profile;
+      }})
+  }
+
+  sendTo() {
+    this.navCtrl.parent.parent.push(TransferPage);
+  }
+
   ionViewWillEnter() {
     this.account = this.navParams.get('account');
     this.name = this.account.name;
     this.title = this.account.name;
+  }
+
+  ionViewDidLeave() {
+    this.navCtrl.popToRoot();
   }
 }

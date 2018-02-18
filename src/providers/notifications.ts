@@ -1,15 +1,30 @@
 import { Injectable } from '@angular/core';
-import { Web3Provider } from './web3';
-import { Subscription } from 'rxjs/Subscription';
 
 @Injectable()
 export class NotificationsProvider {
     blockNumber: number;
     newBlockTimeout: number = 0;
 
-    blockDataSubscription: Subscription;
+    constructor() {
+        
+        /*this.platform.ready().then(() => {
+            console.log(this.platform.platforms());
+            
+            // Android customization
+            this.backgroundMode.setDefaults({ text: 'Doing heavy tasks.' });
+            // Enable background mode
+            this.backgroundMode.enable();
 
-    constructor(private web3Provider: Web3Provider) {
+            console.log('device ready !');
+            this.backgroundMode.on('activate').subscribe(() => {
+                setTimeout(() => {
+                    // Modify the currently displayed notification
+                    backgroundMode.configure({
+                        text:'Running in background for more than 5s now.'
+                    });
+                }, 5000);
+            });
+        });*/
     }
 
     getBlockNumber(): number {
@@ -20,16 +35,5 @@ export class NotificationsProvider {
         return this.newBlockTimeout != 0;
     }
 
-    start() {
-        this.web3Provider.whenReady().map(() => {
-            this.blockDataSubscription = this.web3Provider.blockData().map(block => {
-                this.blockNumber = block.number;
-
-                this.newBlockTimeout++;
-                setTimeout(() => {
-                    this.newBlockTimeout--;
-                }, 3000);
-            }).subscribe();
-        }).subscribe();
-    }
+    start() { }
 }

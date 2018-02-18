@@ -8,7 +8,7 @@ page-transfer {
     }
 
     ion-list.transfer {
-        padding: 10px;
+        padding-bottom: 5px;
         background-color: color($colors, secondary-dark) !important;        
     }
 
@@ -24,10 +24,5 @@ page-transfer {
     .action {
         background-color: color($colors, primary) !important;
         color: color($colors, light) !important;
-    }
-
-    .scan {
-//        margin-left: 10px;
-//        margin-right: 10px;
     }
 }

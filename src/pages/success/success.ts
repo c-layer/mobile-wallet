@@ -1,6 +1,5 @@
 import { Component } from '@angular/core';
 import { NavController, NavParams } from 'ionic-angular';
-import { TabsPage } from '../tabs/tabs';
 
 @Component({
   selector: 'page-success',
@@ -13,7 +12,7 @@ export class SuccessPage {
   constructor(private navCtrl: NavController, private navParams: NavParams) {}
 
   next() {
-    this.navCtrl.setRoot(TabsPage);
+    this.navCtrl.setRoot(this.target);
   }
 
   ionViewDidEnter() {

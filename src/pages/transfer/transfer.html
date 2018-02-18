@@ -3,38 +3,56 @@
 </ion-header>
 
 <ion-content padding class="container">
-  <form>
-    <ion-list class="transfer">
-      <ion-item>
-        <ion-label floating>Currency</ion-label>
-        <ion-select name="selectedCurrency" required [(ngModel)]="selectedCurrency">
-          <ion-option *ngFor="let token of getPositivePortfolio()" [value]="token.currency">{{ token.name }}
-          </ion-option>
-        </ion-select>
-      </ion-item>
-      <ion-item>
-        <ion-label floating>Amount in {{ selectedToken.currency.symbol }} (Max {{ selectedToken.balance
-          }} )</ion-label>
-        <ion-input name="selectedAmount" [(ngModel)]="selectedAmount" type="number" max="{{ selectedToken.balance }}"
-          required></ion-input>
-      </ion-item>
-      <ion-item>
-        <ion-label floating>Beneficiary</ion-label>
-        <ion-select name="selectedAccount" required [(ngModel)]="selectedAccount">
-          <ion-option *ngFor="let account of otherAccounts" [value]="account.address">
-            {{ account.name }}
-          </ion-option>
-        </ion-select>
-        <!--button name="scan" class="action" item-end text-center (click)="scan()">
+  <ion-list class="transfer">
+    <ion-item>
+      <ion-label floating>Currency</ion-label>
+      <ion-select name="selectedCurrency" required [(ngModel)]="selectedCurrency" (ionChange)="update()">
+        <ion-option *ngFor="let token of getPositivePortfolio()" [value]="token.currency+';'+token.network">{{ token.name + ' ('+token.network+')' }}
+        </ion-option>
+      </ion-select>
+    </ion-item>
+    <ion-item>
+      <ion-label floating>Amount in {{ selectedToken.currency.symbol }} (Max {{ selectedTokenBalance
+        }} )</ion-label>
+      <ion-input name="selectedAmount" [(ngModel)]="selectedAmount" (ionChange)="update()"
+        type="number" max="{{ selectedToken.balance }}" required></ion-input>
+    </ion-item>
+    <ion-item>
+      <ion-label floating>Beneficiary</ion-label>
+      <ion-select name="selectedAccount" required [(ngModel)]="selectedAccount" (ionChange)="update()">
+        <ion-option *ngFor="let account of otherAccounts" [value]="account.address">
+          {{ account.name }}
+        </ion-option>
+      </ion-select>
+      <!--button name="scan" class="action" item-end text-center (click)="scan()">
           Scan
         </button-->
-      </ion-item>
-    </ion-list>
-    <ion-list>
-      <button ion-item block text-center type="submit" class="action" (click)="transfer()"
-        [disabled]="!selectedCurrency || !selectedAmount || !selectedAccount">
-        Transfer
-      </button>
-    </ion-list>
-  </form>
+    </ion-item>
+  </ion-list>
+  <ion-list class="transfer">
+    <!--ion-item>
+        <ion-label floating>Gas Price Selector</ion-label>
+        <ion-select name="selectorGasPrice">
+          <ion-option [selected]="true" value="SAFE_LOW">Safe Low</ion-option>
+          <ion-option value="MEDIUM">Medium</ion-option>
+          <ion-option value="HIGH">High</ion-option>
+        </ion-select>
+      </ion-item-->
+    <ion-item>
+      <ion-label floating>Gas Price</ion-label>
+      <ion-input name="selectedGasPrice" [(ngModel)]="selectedGasPrice" type="number" max="{{ selectedToken.balance }}"
+        required>
+      </ion-input>
+    </ion-item>
+    <ion-item>
+      <ion-label item-start>Estimated fees</ion-label>
+      <ion-label item-end>{{ getEstimatedFees() }}</ion-label>
+    </ion-item>
+  </ion-list>
+  <ion-list>
+    <button ion-item block text-center type="submit" class="action" (click)="transfer()"
+      [disabled]="cannotSubmit()">
+      Transfer
+    </button>
+  </ion-list>
 </ion-content>

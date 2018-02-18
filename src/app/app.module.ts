@@ -30,16 +30,24 @@ import { LoaderProvider } from '../providers/loader';
 import { ProfileProvider } from '../providers/profile';
 import { Web3Provider } from '../providers/web3';
 import { IonicStorageModule } from '@ionic/storage';
+import { NetworkProvider } from '../providers/network';
 import { NgxQRCodeModule } from 'ngx-qrcode2';
 import { BarcodeScanner } from '@ionic-native/barcode-scanner';
 import { NotificationsProvider } from '../providers/notifications';
+import { ExplorerProvider } from '../providers/explorer';
+import { NetworksPage } from '../pages/settings/networks/networks';
+import { NodeDetailsPage } from '../pages/node-details/node-details';
+import { BootTimePage } from '../pages/settings/performance/boottime/boottime';
 
 @NgModule({
   declarations: [
     MyApp,
     AccountsPage,
     AccountDetailsPage,
+    BootTimePage,
     LandingPage,
+    NetworksPage,
+    NodeDetailsPage,
     PortfolioPage,
     PortfolioDetailsPage,
     SettingsPage,
@@ -65,7 +73,10 @@ import { NotificationsProvider } from '../providers/notifications';
     MyApp,
     AccountsPage,
     AccountDetailsPage,
+    BootTimePage,
     LandingPage,
+    NetworksPage,
+    NodeDetailsPage,
     PortfolioPage,
     PortfolioDetailsPage,
     SettingsPage,
@@ -84,9 +95,11 @@ import { NotificationsProvider } from '../providers/notifications';
     AccountProvider,
     BarcodeScanner,
     CurrencyProvider,
+    ExplorerProvider,
     FormatProvider,
     LoaderProvider,
     ProfileProvider,
+    NetworkProvider,
     NotificationsProvider,
     StatusBar,
     SplashScreen,

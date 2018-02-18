@@ -3,9 +3,11 @@ import { Account } from '../model/account';
 export class Profile {
   name: string;
   selected: boolean;
-  settings: {};
+  settings: {  };
+  networks: Array<any>;
 
-  tokenDirectories: Array<string>;
+  contracts: {  };
+
   accounts: Array<Account>;
   encryptedMnemonic: any;
   mnemonicIsBackup: boolean;

@@ -16,12 +16,13 @@ export class Account {
 
   derivationId: number;
 
-  portfolio: AccountToken[];
+  portfolio: { [id : string] : AccountToken[] };
 
   constructor(name: string, type: AccountType, address: string) {
     this.name = name;
     this.address = address;
     this.type = type;
+    this.portfolio = {};
   }
   
   public static publicAccount(name: string, address: string) : Account {

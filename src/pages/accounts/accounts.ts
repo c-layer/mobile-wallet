@@ -4,7 +4,6 @@ import { AccountProvider } from '../../providers/account';
 import { Account, AccountType } from '../../model/account';
 import { AccountDetailsPage } from '../details/account-details/account-details';
 import { WalletSecureMode, WalletSecurePage } from '../wallet/wallet-secure/wallet-secure';
-import { TabsPage } from '../tabs/tabs';
 
 @Component({
   selector: 'page-accounts',
@@ -23,7 +22,6 @@ export class AccountsPage {
   }
 
   createAccount() {
-    console.log(this.navCtrl.parent.parent);
     this.navCtrl.parent.parent.push(WalletSecurePage, { 
       mode: WalletSecureMode.ELEVATE_PRIVS,
       callback: (password) => {
@@ -41,7 +39,6 @@ export class AccountsPage {
     event.stopPropagation();
     this.accountProvider.setActive(account);
     this.navCtrl.parent.select(0);
-    this.navCtrl.popToRoot()
   }
 
   getDeterministicWalletAccounts() {
@@ -59,7 +56,7 @@ export class AccountsPage {
       return (account.derivationId == null);
     });
   }
-
+ 
   ionViewWillEnter() {
     this.accounts = this.accountProvider.getAccounts();
   }

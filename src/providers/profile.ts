@@ -17,18 +17,48 @@ export class ProfileProvider {
                 .then(profile => {
 
                     // FIX 0.1.7
-                    if(typeof(profile.mnemonicIsBackup) != "boolean") {
+                    let tobeSaved = false;
+                    if (typeof (profile.mnemonicIsBackup) != "boolean") {
                         profile.mnemonicIsBackup = false;
+                        tobeSaved = true;
+                    }
+
+                    if (!profile.contracts) {
+                        profile.contracts = {
+                            'mainnet': { },
+                            'testnet': {
+                                'RSK': [{
+                                    address: '0x347e70673323bbde4772af6fbbecf7caef084205',
+                                    directory: true
+                                }]
+                            },
+                            'mtpelerin': {
+                                'ETH': [{
+                                    address: '0x73b10223b2318cfb775fbe7bc5781a04c2a0a3cd',
+                                    directory: true
+                                }]
+                            }
+                        }
+                        tobeSaved = true;
+                    }
+
+                    console.log(profile.networks);
+                    if (!profile.networks) {
+                        profile.networks = this.getDefaultNetworks();
+                        tobeSaved = true;
                     }
 
                     this.profile = profile;
-                    return profile;
+                    if (tobeSaved) {
+                        return this.saveProfile();
+                    } else {
+                        return profile;
+                    }
                 }));
     }
 
     public isProfileConsistent(): boolean {
         return this.profile.name
-            && this.profile.tokenDirectories
             && this.profile.accounts
             && this.profile.encryptedMnemonic
             && this.profile.derivationUsed
@@ -39,12 +69,20 @@ export class ProfileProvider {
         return this.profile;
     }
 
-    private saveProfile(): Observable<Profile> {
+    public saveProfile(): Observable<Profile> {
         return Observable.fromPromise(this.storage.set(ProfileProvider.STORAGE_KEY, this.profile)
             .then(() => {
                 console.log('profile saved !');
-            return this.profile;
-        }));
+                return this.profile;
+            }));
+    }
+
+    public clearCache(): Observable<Profile> {
+        this.profile.accounts.forEach(account => {
+            account.portfolio = {};
+        });
+
+        return this.saveProfile();
     }
 
     public clearProfile(): Observable<void> {
@@ -62,13 +100,12 @@ export class ProfileProvider {
         this.profile.name = 'default';
         this.profile.accounts = (params.accounts) ? params.accounts : [];
         this.profile.encryptedWallet = (params.encryptedWallet) ? params.encryptedWallet : [];
-        this.profile.tokenDirectories = (params.tokenDirectories) ? params.tokenDirectories : [];
         this.profile.mnemonicIsBackup = (params.mnemonicIsBackup) ? params.mnemonicIsBackup : false;
+        this.profile.networks = this.getDefaultNetworks();
         return this.saveProfile();
     }
 
     public setTokenDirectories(tokenDirectories: Array<string>) {
-        this.profile.tokenDirectories = tokenDirectories;
         return this.saveProfile();
     }
 
@@ -93,4 +130,53 @@ export class ProfileProvider {
         this.profile.mnemonicIsBackup = true;
         return this.saveProfile();
     }
+
+    public setSettings(settings: any) {
+        this.profile.settings = settings;
+        return this.saveProfile();
+    }
+
+    public setNetworks(networks: any) {
+        this.profile.networks = networks;
+        return this.saveProfile();
+    }
+
+    public getDefaultNetworks() {
+        return [
+          {
+              'name': 'Mainnet',
+              'code': 'mainnet',
+              'active': true,
+              'ETH': {
+                  'name': 'Eth MtPelerin',
+                  'url': 'ws://163.172.104.223:1014'
+              },
+              'RSK': {
+                  'name': 'Rsk MtPelerin',
+                  'url': 'http://163.172.104.223:4443'
+              }
+          },
+          {
+              'name': 'Testnet',
+              'code': 'testnet',
+              'active': false,
+              'ETH': {
+                  'name': 'Eth MtPelerin',
+                  'url': 'ws://163.172.104.223:1024'
+              },
+              'RSK': {
+                  'name': 'Rsk MtPelerin',
+                  'url': 'http://163.172.104.223:4444'
+              }
+          },
+          {
+              'name': 'MtPelerin',
+              'code': 'mtpelerin',
+              'active': false,
+              'ETH': {
+                  'name': 'Eth MtPelerin',
+                  'url': 'ws://163.172.104.223:1004'
+              }
+          }];
+      }    
 }

@@ -5,39 +5,58 @@
 <ion-content padding class="container">
   <div *ngIf="activeAccount">
     <ion-list>
+      <ion-item no-lines>
+        <ion-label item-begin>
+          <b>Balance</b>
+        </ion-label>
+      </ion-item>
       <ion-item>
-        <ion-label item-begin><b>Balance</b></ion-label>
-        <ion-label item-end>{{token.balance}} {{token.currency}}</ion-label>
+        <ion-label text-right class="balance">{{ formatProvider.formatAmount(token.balance) }} {{token.currency}}</ion-label>
       </ion-item>
       <ion-item *ngIf="supply != undefined">
-        <ion-label item-begin><b>Supply</b></ion-label>
+        <ion-label item-begin>
+          <b>Supply</b>
+        </ion-label>
         <ion-label item-end>
           {{formatProvider.formatAmount(supply) }} {{token.currency}}
         </ion-label>
       </ion-item>
-      <button ion-button icon-end solid block *ngIf="activeAccountCanSend(token.currency)"
-          (click)="startTransfer(token, $event)">
-          Send
-          <ion-icon name="card"></ion-icon>
-        </button>
+      <button ion-button icon-end solid block *ngIf="activeAccountCanSend(token)" (click)="startTransfer(token, $event)">
+        Send
+        <ion-icon name="card"></ion-icon>
+      </button>
     </ion-list>
-    <ion-list *ngIf="token.currency != 'ETH'">
+    <ion-list>
       <ion-item class="list-header">
         <b>History</b>
       </ion-item>
-      <ion-item *ngFor="let transfer of history">
-        <ion-label *ngIf="transfer.from">
-          <span class="positiveAmount">+ {{ transfer.amount }} {{token.currency}}</span>
-          <span class="account">from {{ transfer.from }}</span>
-        </ion-label>
-        <ion-label *ngIf="transfer.to">
-          <span class="negativeAmount">- {{ transfer.amount }} {{token.currency}}</span>
-          <span class="account">to {{ transfer.to }}</span>
-        </ion-label>
+      <ion-item *ngIf="!historyReady">
+        <ion-label class="progress">Exploring... {{ progress }}%</ion-label>
       </ion-item>
-      <ion-item *ngIf="history.length == 0" class="nohistory">
-        No history is available
-      </ion-item>
+      <div *ngIf="historyReady && !hasErrors">
+        <ion-item *ngFor="let transfer of history">
+          <ion-label *ngIf="transfer.from">
+            <span class="positiveAmount">+ {{ transfer.amount }}</span>
+            <span class="account">from {{ transfer.from }}</span>
+          </ion-label>
+          <ion-label *ngIf="transfer.to">
+            <span class="negativeAmount">- {{ transfer.amount }}</span>
+            <span class="account">to {{ transfer.to }}</span>
+          </ion-label>
+          <ion-label *ngIf="!transfer.from && !transfer.to">
+              <span class="negativeAmount">- {{ transfer.amount }}</span>
+              <span class="account">for contract creation</span>
+            </ion-label>
+          </ion-item>
+        <ion-item *ngIf="history.length == 0" class="nohistory">
+          No history is available
+        </ion-item>
+      </div>
+      <div *ngIf="historyReady && hasErrors">
+        <ion-item *ngIf="hasErrors" class="nohistory" class="errors">
+          Unable to recover the history
+        </ion-item>
+      </div>
     </ion-list>
   </div>
 </ion-content>

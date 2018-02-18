@@ -1,0 +1,18 @@
+page-node-details {
+    ion-title > *, ion-header ion-icon.back-button-icon.icon {  
+        color: color($colors, primary-light) !important;
+    }
+
+    .container {
+        background-color: color($colors, secondary-light) !important;
+    }
+    
+    ion-item {
+        background-color: color($colors, secondary-dark) !important;  
+        color: color($colors, secondary-light) !important;      
+    }
+
+    div.item-inner {
+        border-color: color($colors, secondary) !important;
+    }
+}

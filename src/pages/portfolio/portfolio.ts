@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { NavController } from 'ionic-angular';
+import { NavController, Refresher } from 'ionic-angular';
 import { PortfolioDetailsPage } from "../portfolio-details/portfolio-details";
 import { TransferPage } from "../transfer/transfer";
 import { AccountProvider } from "../../providers/account";
@@ -24,7 +24,7 @@ export class PortfolioPage {
   }
 
   activeAccountCanSend(token) {
-    return this.accountProvider.accountCanSend(this.activeAccount, token.currency);
+    return this.accountProvider.accountCanSendSymbol(this.activeAccount, token.network, token.currency);
   }
 
   activeAccountBalance(token) {
@@ -40,8 +40,54 @@ export class PortfolioPage {
     this.navCtrl.push(PortfolioDetailsPage, { token: token });
   }
 
+  getCore() {
+    if(!this.activeAccount.portfolio) {
+      return [];
+    }
+    return this.accountProvider.getActiveAccountPortfolio()
+      .filter(item => (item.isCore))
+  }
+
+  getTokens(network) {
+    if(!this.activeAccount.portfolio) {
+      return [];
+    }
+    return this.accountProvider.getActiveAccountPortfolio()
+      .filter(item => (!item.isCore && item.network == network))
+  }
+
+  doRefresh(refresher) {
+    if (this.activeAccount) {
+      this.loaderProvider.startWeb3();
+      this.portfolioSubscription = this.currencyProvider.portfolioObs(this.activeAccount)
+        .first().subscribe(data => {
+          if (data.length > 0) {
+            this.loaderProvider.setStatus('PortfolioLoaded');
+            this.loaderProvider.endStart();
+
+            let portfolio = this.accountProvider.getActiveAccountPortfolio();
+            portfolio.forEach(token => {
+              data.forEach(item => {
+                if(item.currency == token.currency && token.isCore) {
+                  item.untilBlock = token.untilBlock;
+                  item.transactions = token.transactions;
+                }
+              });
+            });
+
+            portfolio = data;
+            this.accountProvider.setActiveAccountPortfolio(portfolio);
+          }
+          if(refresher) {
+            refresher.complete();
+          }
+        });
+    }
+  }
+
   ionViewWillEnter() {
     this.activeAccount = this.accountProvider.getActiveAccount();
+    this.loaderProvider.setStatus('PortfolioStart');
     if (!this.activeAccount) {
       this.navCtrl.parent.select(1);
       return;
@@ -49,14 +95,7 @@ export class PortfolioPage {
   }
 
   ionViewDidEnter() {
-    if (this.activeAccount) {
-      this.loaderProvider.startWeb3();
-      this.portfolioSubscription = this.currencyProvider.portfolioObs(this.activeAccount).first().subscribe(data => {
-        if (data.length > 0) {
-          this.activeAccount.portfolio = data;
-        }
-      });
-    }
+    this.doRefresh(null);
   }
 
   ionViewWillLeave() {

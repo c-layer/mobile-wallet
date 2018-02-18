@@ -16,9 +16,12 @@ page-account-details {
     }
 
     .container > div > div {
-        height: 100%;
         width: 100%;
+        height: 100%;
         padding: 15px;
+        
+        display: flex;
+        flex-flow: column;
     }
 
     ion-list {
@@ -26,6 +29,7 @@ page-account-details {
 
         display: flex;
         flex-flow: column;
+        flex: 1;
         height: 100%;
         padding: 10px;
         background-color: color($colors, secondary-dark) !important; 
@@ -58,7 +62,7 @@ page-account-details {
     .qrcode > img {
         display: block;
         margin: auto;
-        width: 60%;
+        width: 100%;
         min-width: 100px;
         max-width: 220px;
     }
@@ -70,27 +74,34 @@ page-account-details {
         font-weight: bold;
     }
 
-    .action {
-        width: 90%;
-        margin: 10px auto;
+    .actions {
+        min-height: 200px;
+        max-height: 200px;
     }
 
     .input {
         background-color: color($colors, secondary-light) !important;
-        padding-left: 4px;
-        padding-right: 4px;
         color: color($colors, primary-dark) !important;
+    }
+
+    .input-name {
+        padding-left: 20px;
+        padding-right: 20px;
+    }
+
+    .input-name > div.item-inner {
+        padding: 0px !important;
     }
 
     .action-confirm {
         background-color: color($colors, primary) !important;
-        float:left;
-        width: 45%;
+        margin: 20px auto auto auto;
+        width: 95%;
     }
 
     .action-danger {
         background-color: color($colors, danger) !important;
-        float:right;
-        width: 45%;
+        margin: 20px auto auto auto;
+        width: 95%;
     }
 }

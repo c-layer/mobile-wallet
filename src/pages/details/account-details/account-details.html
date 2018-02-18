@@ -12,21 +12,22 @@
         <ngx-qrcode [qrc-value]="account.address" qrc-errorCorrectionLevel="L" qrc-version="5"></ngx-qrcode>
       </ion-item>
       <ion-item text-center class="key">{{ account.address }}</ion-item>
+    </ion-list>
+    <ion-list no-lines class="actions">
       <div *ngIf="!renaming">
-          <button text-center ion-item (click)="startRename()" block color="primary">Rename</button>
-          <button text-center ion-item disabled=true block>Send To</button>
+          <button text-center ion-item (click)="startRename()" block color="secondary">Rename</button>
+          <button text-center ion-item (click)="sendTo()" [disabled]="!accountCanSend()" 
+            block color="primary">Send To</button>
           <button text-center ion-item disabled=true block>Share</button>
-          <button text-center ion-item disabled=true block color="danger">Delete</button>
+          <button text-center ion-item (click)="delete()" [disabled]="account.derivationId!=null"
+            block color="danger">Delete</button>
       </div>
-
       <div *ngIf="renaming && !loading">
-        <ion-item color="secondary-light">
+        <ion-item color="secondary-light" class="input-name">
           <ion-input #inputName name="inputName" type="text" required [(ngModel)]="name"></ion-input>
         </ion-item>
-        <ion-item>
-          <button text-center ion-button class="action-danger" (click)="cancelRename()">Cancel</button>
-          <button text-center ion-button class="action-confirm" (click)="rename()">Confirm</button>
-        </ion-item>
+        <button text-center ion-item class="action-danger" (click)="cancelRename()">Cancel</button>
+        <button text-center ion-item class="action-confirm" (click)="rename()">Confirm</button>
       </div>
       <div class="loading" *ngIf="loading">
         <p>Updating ...</p>

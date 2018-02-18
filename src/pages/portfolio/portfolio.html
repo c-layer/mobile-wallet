@@ -3,24 +3,63 @@
 </ion-header>
 
 <ion-content class="container">
+  <ion-refresher (ionRefresh)="doRefresh($event)">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
   <ion-list clear *ngIf="activeAccount">
-    <button ion-item *ngFor="let token of activeAccount.portfolio" (click)="goToDetailsPage(token)" class="token">
+    <ion-item-divider>Core</ion-item-divider>
+    <button ion-item *ngFor="let token of getCore()" (click)="goToDetailsPage(token)"
+      class="token">
       <ion-avatar item-start>
-        <img *ngIf="token.image" type="image/svg+xml"
-            src="{{ token.image }}" class="token-svg"/>
-        <img *ngIf="!token.image" class="token-svg"
-            src="assets/imgs/currencies/OTHER.png"/>
+        <img *ngIf="token.image" type="image/svg+xml" src="{{ token.image }}" class="token-svg"/>
+        <img *ngIf="!token.image" class="token-svg" src="assets/imgs/currencies/OTHER.png"/>
       </ion-avatar>
-      <h2><b>{{ activeAccountBalance(token) }}</b></h2>
-      <button item-end ion-button icon-end solid
-        *ngIf="activeAccountCanSend(token)"
-        (click)="startTransfer(token, $event)">
+      <h2>
+        <b>{{ activeAccountBalance(token) }}</b>
+      </h2>
+      <button item-end ion-button icon-end solid *ngIf="activeAccountCanSend(token)" (click)="startTransfer(token, $event)">
+        Send
+        <ion-icon name="card"></ion-icon>
+      </button>
+    </button>
+
+    <ion-item-divider *ngIf="getTokens('RSK') != false">RSK Tokens</ion-item-divider>
+    <button ion-item *ngFor="let token of getTokens('RSK')" (click)="goToDetailsPage(token)"
+      class="token">
+      <ion-avatar item-start>
+        <img *ngIf="token.image" type="image/svg+xml" src="{{ token.image }}" class="token-svg"
+        />
+        <img *ngIf="!token.image" class="token-svg" src="assets/imgs/currencies/OTHER.png"
+        />
+      </ion-avatar>
+      <h2>
+        <b>{{ activeAccountBalance(token) }}</b>
+      </h2>
+      <button item-end ion-button icon-end solid *ngIf="activeAccountCanSend(token)" (click)="startTransfer(token, $event)">
+        Send
+        <ion-icon name="card"></ion-icon>
+      </button>
+    </button>
+
+    <ion-item-divider *ngIf="getTokens('ETH') != false">ETH Tokens</ion-item-divider>
+    <button ion-item *ngFor="let token of getTokens('ETH')" (click)="goToDetailsPage(token)"
+      class="token">
+      <ion-avatar item-start>
+        <img *ngIf="token.image" type="image/svg+xml" src="{{ token.image }}" class="token-svg"
+        />
+        <img *ngIf="!token.image" class="token-svg" src="assets/imgs/currencies/OTHER.png"
+        />
+      </ion-avatar>
+      <h2>
+        <b>{{ activeAccountBalance(token) }}</b>
+      </h2>
+      <button item-end ion-button icon-end solid *ngIf="activeAccountCanSend(token)" (click)="startTransfer(token, $event)">
         Send
         <ion-icon name="card"></ion-icon>
       </button>
     </button>
   </ion-list>
   <ion-card>
-  <ion-label *ngIf="!activeAccount" text-center color="warn">Please select an account</ion-label>
-</ion-card>
+    <ion-label *ngIf="!activeAccount" text-center color="warn">Please select an account</ion-label>
+  </ion-card>
 </ion-content>
