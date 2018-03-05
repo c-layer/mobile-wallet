@@ -1,12 +1,32 @@
 import { Injectable } from '@angular/core';
-import { Web3Provider } from './web3';
+import { Platform } from 'ionic-angular/platform/platform';
 
 @Injectable()
 export class NotificationsProvider {
     blockNumber: number;
     newBlockTimeout: number = 0;
 
-    constructor(private web3Provider: Web3Provider) {
+    constructor(private platform: Platform) {
+        console.log('notification started');
+        
+        /*this.platform.ready().then(() => {
+            console.log(this.platform.platforms());
+            
+            // Android customization
+            this.backgroundMode.setDefaults({ text: 'Doing heavy tasks.' });
+            // Enable background mode
+            this.backgroundMode.enable();
+
+            console.log('device ready !');
+            this.backgroundMode.on('activate').subscribe(() => {
+                setTimeout(() => {
+                    // Modify the currently displayed notification
+                    backgroundMode.configure({
+                        text:'Running in background for more than 5s now.'
+                    });
+                }, 5000);
+            });
+        });*/
     }
 
     getBlockNumber(): number {
@@ -17,5 +37,5 @@ export class NotificationsProvider {
         return this.newBlockTimeout != 0;
     }
 
-    start() {    }
+    start() { }
 }

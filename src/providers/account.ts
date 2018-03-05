@@ -212,7 +212,7 @@ export class AccountProvider {
         return account.type == AccountType.HOT
             && account.portfolio.filter(item => {
                 return item.currency == symbol && item.network == network
-                    && item.balance > 0;
+                    && Number.parseInt(item.balance) > 0;
             }).length > 0;
     };
 

@@ -33,6 +33,7 @@ import { IonicStorageModule } from '@ionic/storage';
 import { NgxQRCodeModule } from 'ngx-qrcode2';
 import { BarcodeScanner } from '@ionic-native/barcode-scanner';
 import { NotificationsProvider } from '../providers/notifications';
+import { ExplorerProvider } from '../providers/explorer';
 
 @NgModule({
   declarations: [
@@ -84,6 +85,7 @@ import { NotificationsProvider } from '../providers/notifications';
     AccountProvider,
     BarcodeScanner,
     CurrencyProvider,
+    ExplorerProvider,
     FormatProvider,
     LoaderProvider,
     ProfileProvider,

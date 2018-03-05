@@ -12,6 +12,7 @@ import 'rxjs/add/operator/toPromise';
 import { ProfileProvider } from './profile';
 import { AccountProvider } from './account';
 import { AccountToken } from '../model/account-token';
+import { ExplorerProvider } from './explorer';
 
 @Injectable()
 export class CurrencyProvider {
@@ -19,7 +20,8 @@ export class CurrencyProvider {
 
   constructor(private web3Provider: Web3Provider,
     private profileProvider: ProfileProvider,
-    private accountProvider: AccountProvider) {
+    private accountProvider: AccountProvider,
+    private explorerProvider: ExplorerProvider) {
   }
 
   public getCurrencyById(id: number): Currency {
@@ -46,17 +48,21 @@ export class CurrencyProvider {
       if (currencies.length == 0) return Observable.of([]);
       return Observable.forkJoin(currencies.map(currency => {
         if (currency.contract == null) {
-          return currency.balanceOf(account).map((balance) =>
-            <AccountToken>{
+          return Observable.forkJoin([currency.balanceOf(account),
+          currency.history(account)]).map(data => {
+            let balance = data[0].toString();
+            let transactions: any = data[1];
+
+            return <AccountToken>{
               currency: currency.symbol,
               image: currency.image,
               network: null,
               name: currency.name,
               balance: balance,
               untilBlock: null,
-              transactions: []
+              transactions: transactions
             }
-          );
+          });
         } else {
           return currency.balanceOf(account).map(balance => {
             let transactions = [];
@@ -101,6 +107,7 @@ export class CurrencyProvider {
       balanceOf: (account: Account) => Observable.fromPromise(Promise.resolve(account)
         .then(account => web3.eth.getBalance(account.address)
           .then(balance => web3.utils.fromWei(balance, 'ether')))),
+      history: (account: Account) => this.explorerProvider.findCoreTransactions(web3, account),
       transfer: function (sender: Account, password: string,
         beneficiaryAddress: string, amount: number) {
         let value = this.web3Provider.getUtils().toWei(amount, 'ether');
@@ -141,10 +148,19 @@ export class CurrencyProvider {
               supply: details[2],
               symbol: details[1],
               image: 'assets/imgs/currencies/MTPELERIN.svg',
-              balanceOf: (account: Account) =>
-                Observable.fromPromise(Promise.resolve(account)
-                  .then(account => contract.methods.balanceOf(account.address).call())
-                  .then((balance: number) => (balance) ? balance / 100 : 0)),
+              balanceOf: function (account: Account) {
+                return Observable.fromPromise(Promise.resolve(account)
+                  .then(account => {
+                    const Web3 = require("web3");
+                    let web3 = new Web3(this.contract._provider);
+                    this.contract.methods.balanceOf(account.address).call();
+                    return this.contract.methods.balanceOf(account.address).call();
+                  })
+                  .then((balance: number) => {
+                    return ((balance) ? balance / 100 : 0) + '';
+                  }))
+              },
+              history: function (account: Account) { },
               transfer: function (sender: Account, password: string, beneficiaryAddress: string, amount: number) {
                 console.log(amount + ' ' + this.symbol + ' to ' + beneficiaryAddress);
                 let cents = amount * (10 ** this.decimal);
@@ -175,19 +191,19 @@ export class CurrencyProvider {
         this.getDirectory('RSK', this.web3Provider.getRskProvider(), directory)))
     ).then(data => {
       let tokens = [
-        this.getCoreCurrency(this.web3Provider.getRskProvider(), 
+        this.getCoreCurrency(this.web3Provider.getRskProvider(),
           'SmartBTC', 'SBTC', 'assets/imgs/currencies/RSK.png'),
-        this.getCoreCurrency(this.web3Provider.getEthProvider(), 
+        this.getCoreCurrency(this.web3Provider.getEthProvider(),
           'Ethereum', 'ETH', 'assets/imgs/currencies/ETHER.svg')
       ];
 
-      if(data[0]) {
+      if (data[0]) {
         tokens = tokens.concat(data[0]);
       }
-      if(data[1]) {
+      if (data[1]) {
         tokens = tokens.concat(data[1])
       }
-      
+
       return Promise.all(tokens);
     });
 

@@ -56,6 +56,6 @@ export class TransferPage {
   }
 
   public getPositivePortfolio() {
-    return this.activeAccount.portfolio.filter(element => element.balance > 0);
+    return this.activeAccount.portfolio.filter(element => Number.parseInt(element.balance) > 0);
   }
 }

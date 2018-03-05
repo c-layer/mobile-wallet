@@ -2,7 +2,7 @@ export class AccountToken {
     currency: string;
     image: string;
     network: string;
-    balance: number;
+    balance: string;
     untilBlock: number;
     transactions: any[];
 }
