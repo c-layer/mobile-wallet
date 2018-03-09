@@ -5,4 +5,5 @@ export class AccountToken {
     balance: string;
     untilBlock: number;
     transactions: any[];
+    isCore: boolean;
 }

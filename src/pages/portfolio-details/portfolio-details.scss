@@ -6,7 +6,7 @@ page-portfolio-details {
     .container {
         background-color: color($colors, secondary-light) !important;
     }
-
+    
     ion-item {
         background-color: color($colors, secondary-dark) !important;  
         color: color($colors, secondary-light) !important;      
@@ -17,6 +17,10 @@ page-portfolio-details {
     }
 
     .nohistory { 
+        text-align: center;
+    }
+
+    .progress {
         text-align: center;
     }
 

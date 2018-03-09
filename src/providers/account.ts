@@ -41,7 +41,7 @@ export class AccountProvider {
         this.encryptedMnemonic = profile.encryptedMnemonic;
         this.derivationUsed = profile.derivationUsed;
         this.encryptedWallet = profile.encryptedWallet;
-}
+   }
 
     public unlock(password: string): Observable<boolean> {
         return Observable.fromPromise(new Promise((resolve, reject) => {
@@ -140,7 +140,8 @@ export class AccountProvider {
             account.type == AccountType.HOT) {
             try {
                 let privateKey = null;
-                let wallet = this.web3Provider.getAccounts().wallet.decrypt(this.encryptedWallet, password);
+                let wallet = this.web3Provider.getEthProvider()
+                    .eth.accounts.wallet.decrypt(this.encryptedWallet, password);
                 for (var i = 0; i < wallet.length; i++) {
                     if (wallet[i].address == account.address) {
                         privateKey = wallet[i].privateKey;
@@ -212,7 +213,7 @@ export class AccountProvider {
         return account.type == AccountType.HOT
             && account.portfolio.filter(item => {
                 return item.currency == symbol && item.network == network
-                    && Number.parseInt(item.balance) > 0;
+                    && Number(item.balance) > 0;
             }).length > 0;
     };
 

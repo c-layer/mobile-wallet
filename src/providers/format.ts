@@ -1,7 +1,12 @@
 import { Injectable } from '@angular/core';
+import { AccountProvider } from './account';
+import { CurrencyProvider } from './currency';
 
 @Injectable()
 export class FormatProvider {
+
+    constructor(private accountProvider: AccountProvider, private currencyProvider: CurrencyProvider) {}
+    
     public formatAmount(value: number): string {
         if(value==null || value==undefined) return;
 
@@ -33,5 +38,26 @@ export class FormatProvider {
             + ' ' + digits2(date.getHours())
             + ':' + digits2(date.getMinutes())
             + ':' + digits2(date.getSeconds());
+    }
+
+    formatAddress(address) {
+        let name = address;
+
+        if(name && name.startsWith('0x')) {
+            name = this.accountProvider.getAccountName(address);
+        }
+        if(name == '0x0000000000000000000000000000000001000006') {
+            name = 'Bitcoin-RSK bridge';
+        }
+
+        if(name && name.startsWith('0x')) {
+            name = this.currencyProvider.getCurrencyName(address);
+
+            if(name && !name.startsWith('0x')) {
+                name += ' contract';
+            }
+        }
+
+        return name;
     }
 }

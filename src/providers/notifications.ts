@@ -1,13 +1,11 @@
 import { Injectable } from '@angular/core';
-import { Platform } from 'ionic-angular/platform/platform';
 
 @Injectable()
 export class NotificationsProvider {
     blockNumber: number;
     newBlockTimeout: number = 0;
 
-    constructor(private platform: Platform) {
-        console.log('notification started');
+    constructor() {
         
         /*this.platform.ready().then(() => {
             console.log(this.platform.platforms());

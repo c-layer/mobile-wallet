@@ -12,7 +12,9 @@ export class Currency {
   supply: number;
   symbol: string;
   image: string;
-  balanceOf(account: Account): Observable<string> { return null; };
-  history(account: Account): BehaviorSubject<any> { return null; };
-  transfer(sender: Account, password: string, beneficiaryAddress: string, amount: number): Observable<Transaction> { return null; }
+  isCore: boolean;
+  balanceOf(account: Account): Observable<number> { return null; };
+  history(account: Account, start: number): BehaviorSubject<any> { return null; };
+  transfer(sender: Account, password: string, 
+      beneficiaryAddress: string, amount: number): Observable<any> { return null; }
 }

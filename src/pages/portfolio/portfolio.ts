@@ -41,11 +41,17 @@ export class PortfolioPage {
   }
 
   getCore() {
-    return this.activeAccount.portfolio.filter(item => (item.network == null))
+    if(!this.activeAccount.portfolio) {
+      return [];
+    }
+    return this.activeAccount.portfolio.filter(item => (item.isCore))
   }
 
   getTokens(network) {
-    return this.activeAccount.portfolio.filter(item => (item.network == network))
+    if(!this.activeAccount.portfolio) {
+      return [];
+    }
+    return this.activeAccount.portfolio.filter(item => (!item.isCore && item.network == network))
   }
 
   doRefresh(refresher) {

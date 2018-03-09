@@ -22,7 +22,7 @@ export class Web3Provider {
   }
 
   getAccounts() {
-    return this.eth.web3.accounts;
+    return this.eth.web3.eth.accounts;
   }
 
   encodeAddress(address: string): string {

@@ -16,7 +16,8 @@
           <button text-center ion-item (click)="startRename()" block color="primary">Rename</button>
           <button text-center ion-item disabled=true block>Send To</button>
           <button text-center ion-item disabled=true block>Share</button>
-          <button text-center ion-item disabled=true block color="danger">Delete</button>
+          <button text-center ion-item (click)="delete()" [disabled]="account.derivationId!=null"
+             block color="danger">Delete</button>
       </div>
 
       <div *ngIf="renaming && !loading">
