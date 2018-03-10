@@ -214,6 +214,9 @@ export class CurrencyProvider {
       estimateTransfer: (sender: Account, beneficiaryAddress: string, amount: number) => {
         let value = web3.utils.toWei(amount, 'ether');
         return Observable.fromPromise(web3.eth.estimateGas({ from: sender.address, to: beneficiaryAddress, value}));
+      },
+      getGasPrice: () => {
+        return Observable.fromPromise(web3.eth.getGasPrice());
       }
     });
   }
@@ -266,6 +269,9 @@ export class CurrencyProvider {
                   { from: sender.address, to: beneficiaryAddress, value: 0}
                 ));
               },
+              getGasPrice: () => {
+                return Observable.fromPromise(web3.eth.getGasPrice());
+              }
             });
           } else {
             return null;

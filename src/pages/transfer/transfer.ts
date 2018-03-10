@@ -31,7 +31,7 @@ export class TransferPage {
   getEstimatedFees() {
     let estimatedFees = '--- GWei';
     if (this.estimatedGas
-       && Number.parseInt(this.selectedTokenBalance) >= this.selectedAmount) {
+      && Number.parseInt(this.selectedTokenBalance) >= this.selectedAmount) {
       let fees = (this.selectedGasPrice * this.estimatedGas);
       if (fees > 10 ** 9) {
         estimatedFees = (fees / 10 ** 9) + ' GWei';
@@ -43,6 +43,14 @@ export class TransferPage {
   }
 
   update() {
+    if(this.selectedCurrency) {
+      this.getCurrency().getGasPrice().subscribe((data) => {
+        if (data) {
+          this.selectedGasPrice = data;
+        }
+      });
+    }
+
     if (this.selectedCurrency) {
       let balance = null;
       this.activeAccount.portfolio.forEach(token => {
@@ -105,8 +113,8 @@ export class TransferPage {
 
   public cannotSubmit() {
     return !this.selectedCurrency || !this.selectedAmount
-       || !this.selectedAccount || !this.selectedGasPrice
-          || (Number.parseInt(this.selectedTokenBalance) < this.selectedAmount);
+      || !this.selectedAccount || !this.selectedGasPrice
+      || (Number.parseInt(this.selectedTokenBalance) < this.selectedAmount);
   }
 
   public scan() {
