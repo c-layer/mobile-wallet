@@ -43,16 +43,16 @@ export class CurrencyProvider {
     return found;
   }
 
-  public getCurrencyName(address: string) {
-    let name = address;
+  public getCurrencyByAddress(address: string) {
+    let result = null;
     if (address) {
       this.currencies.forEach(currency => {
         if (currency.address == address) {
-          name = currency.name;
+          result = currency;
         }
       })
     }
-    return name;
+    return result;
   }
 
   public portfolioObs(account: Account): Observable<AccountToken[]> {
@@ -109,24 +109,72 @@ export class CurrencyProvider {
         } else {
           return currency.balanceOf(account).map(balance => {
             let transactions = [];
-            currency.contract.events.Transfer({
-              fromBlock: 0,
-              //   toBlock: null,
-              topics: [null, this.web3Provider.encodeAddress(account.address), null]
-            }).subscribe((error, data) => {
-              if (data) {
-                transactions.push(data);
-              }
-            });
-            currency.contract.events.Transfer({
-              fromBlock: 0,
-              //   toBlock: null,
-              topics: [null, null, this.web3Provider.encodeAddress(account.address)]
-            }).subscribe((error, data) => {
-              if (data) {
-                transactions.push(data);
-              }
-            });
+
+            if (currency.network == 'RSK' && currency.symbol == 'GBP') {
+              /*              currency.contract.events.Transfer({
+                              fromBlock: 0,
+                              //   toBlock: null,
+                              topics: [null, this.web3Provider.encodeAddress(account.address), null]
+                            }).subscribe((error, data) => {
+                              if (error) {
+                                console.error(error);
+                              } else if (data) {
+                                transactions.push(data);
+                                console.log(data);
+                              }
+                            });*/
+
+              /*              this.web3Provider.getRskProvider().currentProvider.send({
+                              jsonrpc: '2.0',
+                              id: '2',
+                              method: 'eth_getLogs',
+                              params: [{
+                                fromBlock: "0x26280",
+                                toBlock: "0x26290",
+                                address: currency.address,
+                                topics: ['0x8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e0', null,
+                                  this.web3Provider.encodeAddress(account.address)]
+                              }]
+                            }, (err, data) => {
+                              if (err) {
+                                console.error(err);
+                              } else {
+                                console.log(data.result[0].transactionHash);
+                                this.web3Provider.getRskProvider().eth.getTransaction(data.result[0].transactionHash,
+                                  (err, data) => {
+                                  console.log(data);
+                                });
+                                console.log(data);
+                              }
+                            });  */
+            }
+
+            if (currency.network == 'ETH') {
+              currency.contract.events.Transfer({
+                fromBlock: 0,
+                //   toBlock: null,
+                topics: [null, this.web3Provider.encodeAddress(account.address), null]
+              }).subscribe((error, data) => {
+                if (error) {
+                  console.error(error);
+                } else if (data) {
+                  transactions.push(data);
+                  console.log(data);
+                }
+              });
+              currency.contract.events.Transfer({
+                fromBlock: 0,
+                //   toBlock: null,
+                topics: [null, null, this.web3Provider.encodeAddress(account.address)]
+              }).subscribe((error, data) => {
+                if (error) {
+                  console.error(error);
+                } else if (data) {
+                  transactions.push(data);
+                  console.log(data);
+                }
+              });
+            }
             return <AccountToken>{
               currency: currency.symbol,
               image: currency.image,
@@ -161,7 +209,11 @@ export class CurrencyProvider {
         return this.accountProvider.getPrivateKey(sender, password).flatMap(privateKey => {
           return this.web3Provider.sendSignedTransaction(web3,
             sender.address, privateKey, beneficiaryAddress, value, null);
-          });
+        });
+      },
+      estimateTransfer: (sender: Account, beneficiaryAddress: string, amount: number) => {
+        let value = web3.utils.toWei(amount, 'ether');
+        return Observable.fromPromise(web3.eth.estimateGas({ from: sender.address, to: beneficiaryAddress, value}));
       }
     });
   }
@@ -175,6 +227,7 @@ export class CurrencyProvider {
           let contract = new web3.eth.Contract(FiatToken.abi, address);
           if (contract) {
             let methods = contract.methods;
+            let decimal = 2;
             return Promise.all([
               methods.name().call(),
               methods.symbol().call()
@@ -182,7 +235,7 @@ export class CurrencyProvider {
               methods.totalSupply().call(),
             ]).then(details => <Currency>{
               name: details[0],
-              decimal: 2,
+              decimal: decimal,
               network: network,
               address: address,
               contract: contract,
@@ -193,18 +246,26 @@ export class CurrencyProvider {
               balanceOf: function (account: Account) {
                 return Observable.fromPromise(Promise.resolve(account)
                   .then(account => this.contract.methods.balanceOf(account.address).call()
-                      .then(balance => balance / 10 ** this.decimal)
+                    .then(balance => balance / 10 ** this.decimal)
                   ));
               },
               history: function (account: Account, start: number) { },
-              transfer: function (sender: Account, password: string, beneficiaryAddress: string, amount: number) {
-                console.log(amount + ' ' + this.symbol + ' to ' + beneficiaryAddress);
-                let cents = amount * (10 ** this.decimal);
+              transfer: (sender: Account, password: string, beneficiaryAddress: string,
+                amount: number) => {
+                console.log(amount + ' ' + details[1] + ' to ' + beneficiaryAddress);
+                let cents = amount * (10 ** decimal);
                 let contractData = methods.transfer(beneficiaryAddress, cents).encodeABI();
-                return this.accountProvider.getPrivateKey(sender, password).flatMap(privateKey =>
-                  web3.sendSignedTransaction(web3,
-                    sender.address, privateKey, address, null, contractData));
-              }
+                return this.accountProvider.getPrivateKey(sender, password)
+                  .flatMap(privateKey =>
+                    this.web3Provider.sendSignedTransaction(web3,
+                      sender.address, privateKey, address, null, contractData));
+              },
+              estimateTransfer: (sender: Account, beneficiaryAddress: string, amount: number) => {
+                let cents = amount * (10 ** decimal);
+                return Observable.fromPromise(methods.transfer(beneficiaryAddress, cents).estimateGas(
+                  { from: sender.address, to: beneficiaryAddress, value: 0}
+                ));
+              },
             });
           } else {
             return null;

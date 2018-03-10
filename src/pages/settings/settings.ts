@@ -15,6 +15,7 @@ import { LoaderProvider } from '../../providers/loader';
   templateUrl: 'settings.html',
 })
 export class SettingsPage {
+  public hasCache:boolean = false;
   public loadingSteps: any[];
   public profile: Profile = <Profile>{};
   public confirmations: number = 3;
@@ -43,6 +44,12 @@ export class SettingsPage {
         }));
       }
     });
+  }
+
+  clearCache() {
+    this.profileProvider.clearCache().subscribe(() => {
+      this.hasCache = false;
+   });    
   }
 
   clearData() {
@@ -76,5 +83,12 @@ export class SettingsPage {
   ionViewWillEnter() {
     this.profile = this.profileProvider.getProfile() ?
       this.profileProvider.getProfile() : this.profile;
+
+    this.hasCache = false;
+    this.profile.accounts.forEach(account => {
+      if(account.portfolio.length > 0) {
+        this.hasCache = true;
+      }
+    });
   }
 }

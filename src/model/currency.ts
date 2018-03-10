@@ -17,4 +17,5 @@ export class Currency {
   history(account: Account, start: number): BehaviorSubject<any> { return null; };
   transfer(sender: Account, password: string, 
       beneficiaryAddress: string, amount: number): Observable<any> { return null; }
-}
+  estimateTransfer(sender: Account, beneficiaryAddress: string, amount: number): Observable<any> { return null; }
+  }

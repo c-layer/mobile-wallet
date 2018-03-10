@@ -8,6 +8,7 @@ import { CurrencyProvider } from "../../providers/currency";
 import { FormatProvider } from "../../providers/format";
 import { LoaderProvider } from '../../providers/loader';
 import { Subscription } from 'rxjs/Subscription';
+import { ProfileProvider } from '../../providers/profile';
 
 @Component({
   selector: 'page-portfolio',
@@ -20,6 +21,7 @@ export class PortfolioPage {
 
   constructor(private navCtrl: NavController, private currencyProvider: CurrencyProvider,
     public accountProvider: AccountProvider, public formatProvider: FormatProvider,
+    private profileProvider: ProfileProvider,
     private loaderProvider: LoaderProvider) {
   }
 
@@ -62,7 +64,17 @@ export class PortfolioPage {
           if (data.length > 0) {
             this.loaderProvider.setStatus('PortfolioLoaded');
             this.loaderProvider.endStart();
+
+            this.activeAccount.portfolio.forEach(token => {
+              data.forEach(item => {
+                if(item.currency == token.currency && token.isCore) {
+                  item.untilBlock = token.untilBlock;
+                  item.transactions = token.transactions;
+                }
+              });
+            });
             this.activeAccount.portfolio = data;
+            this.profileProvider.setPortfolio(this.activeAccount.portfolio);
           }
           if(refresher) {
             refresher.complete();

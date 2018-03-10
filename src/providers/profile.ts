@@ -3,6 +3,7 @@ import { Observable } from 'rxjs';
 import { Profile } from '../model/profile';
 import { Storage } from '@ionic/storage';
 import { Account } from '../model/account';
+import { AccountToken } from '../model/account-token';
 
 @Injectable()
 export class ProfileProvider {
@@ -60,6 +61,14 @@ export class ProfileProvider {
             }));
     }
 
+    public clearCache(): Observable<Profile> {
+        this.profile.accounts.forEach(account => {
+            account.portfolio = [];
+        });
+
+        return this.saveProfile();
+    }
+
     public clearProfile(): Observable<void> {
         return Observable.fromPromise(this.storage.remove(ProfileProvider.STORAGE_KEY).then(profile => {
             this.profile = null;
@@ -80,6 +89,10 @@ export class ProfileProvider {
     }
 
     public setTokenDirectories(tokenDirectories: Array<string>) {
+        return this.saveProfile();
+    }
+
+    public setPortfolio(portfolio: Array<AccountToken>) {
         return this.saveProfile();
     }
 

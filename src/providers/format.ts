@@ -51,10 +51,10 @@ export class FormatProvider {
         }
 
         if(name && name.startsWith('0x')) {
-            name = this.currencyProvider.getCurrencyName(address);
+            let currency = this.currencyProvider.getCurrencyByAddress(address);
 
-            if(name && !name.startsWith('0x')) {
-                name += ' contract';
+            if(currency) {
+                name = currency.name + ' ('+currency.network+') contract';
             }
         }
 

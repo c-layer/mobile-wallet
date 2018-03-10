@@ -8,6 +8,7 @@ import { CurrencyProvider } from '../../providers/currency';
 import { Currency } from '../../model/currency';
 import { Account } from '../../model/account';
 import { AccountToken } from '../../model/account-token';
+import { ProfileProvider } from '../../providers/profile';
 
 @Component({
   selector: 'page-portfolio-details',
@@ -25,6 +26,7 @@ export class PortfolioDetailsPage {
 
   constructor(private accountProvider: AccountProvider,
     private currencyProvider: CurrencyProvider,
+    private profileProvider: ProfileProvider,
     public formatProvider: FormatProvider,
     public navCtrl: NavController, public navParams: NavParams) {
   }
@@ -35,6 +37,10 @@ export class PortfolioDetailsPage {
 
   formatContractTransactions(transactions) {
     return this.token.transactions.map(transaction => {
+      if(!transaction || !transaction.returnValues) {
+        return;
+      }
+
       let values = transaction.returnValues;
       let from = (values.from == this.activeAccount.address) ? null :
         this.formatProvider.formatAddress(values.from);
@@ -105,17 +111,20 @@ export class PortfolioDetailsPage {
     this.progress = 0;
     this.historyReady = false;
     if (this.currency && this.currency.isCore) {
-      let start = 0;//(this.token.untilBlock) ? this.token.untilBlock : 0;
+      let start = (this.token.untilBlock) ? this.token.untilBlock : 0;
       this.historyReady = false;
       this.currency.history(this.activeAccount, start).subscribe(result => {
         if(result && result.block && result.block != 0) {
           this.progress = Math.floor((result.completion/result.block)*10000)/100;
         }
 
-        if(result.block && result.block == result.completion) {
-          this.token.transactions = result.transactions;
+        if((result.block >= 0) && result.block == result.completion) {
+          this.token.transactions = this.token.transactions.concat(result.transactions);
+          this.token.untilBlock += result.block;
           this.history = this.formatCoreTransactions(result.network, this.token.transactions);
           this.historyReady = true;
+
+          this.profileProvider.setPortfolio(this.activeAccount.portfolio);
         }
       });
     } else {
