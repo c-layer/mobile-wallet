@@ -1,0 +1,28 @@
+page-networks {
+    ion-title > * {  
+        color: color($colors, primary-light) !important;
+    }
+
+    .container {
+        background-color: color($colors, secondary-light) !important;
+    }
+
+    ion-item {
+        background-color: color($colors, secondary-light) !important;  
+        color: color($colors, secondary-dark) !important;      
+    }
+
+    .info {
+        font-weight: bold;
+    }
+
+    ion-select {
+        max-width: 100%;
+        width: 100%;
+    }
+
+    .active-network {
+        background-color: color($colors, secondary-dark) !important;        
+        color: color($colors, secondary-light) !important;
+    }
+}

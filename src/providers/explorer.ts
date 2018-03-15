@@ -67,7 +67,6 @@ export class ExplorerProvider {
         start, end, fTxCountStart, fTxCountEnd, fTxBalanceStart, fTxBalanceEnd) {
 
         if ((end - start) == 1) {
-            console.log('Loading txs from ' + end);
             this.loadTxFromBlock(web3, end, account.address,
                 fTxBalanceEnd - fTxBalanceStart, result, resultValue);
             return;
@@ -150,6 +149,8 @@ export class ExplorerProvider {
                 resultValue.completion = block - start;
                 result.next(resultValue);
             }
+        }).catch(err => {
+            console.error(err);
         });
 
         console.log('Starting Exploring ' + network + ' Blockchain for ' + account.address + '...');

@@ -77,15 +77,31 @@ export class Web3Provider {
   }
 
   start() {
-    this.rsk.web3 = new Web3(new Web3.providers.HttpProvider("http://163.172.104.223:4444"));
-    this.eth.web3 = new Web3(new Web3.providers.WebsocketProvider("ws://163.172.104.223:1004"));
+    let profile = this.profileProvider.getProfile();
+    let activeNetwork = null;
+    profile.networks.forEach(network => {
+      if (network.active) {
+        activeNetwork = network;
+      }
+    })
 
-    this.rsk.web3.eth.getBlockNumber().then(number =>
-      this.rsk.blockNumber = number
-    );
-    this.eth.web3.eth.getBlockNumber().then(number =>
-      this.eth.blockNumber = number
-    );
+    if (activeNetwork.RSK.url) {
+      this.rsk.web3 = new Web3(new Web3.providers.HttpProvider(activeNetwork.RSK.url));
+      this.rsk.web3.eth.getBlockNumber().then(number =>
+        this.rsk.blockNumber = number
+      );
+      } else {
+      delete this.rsk.web3;
+    }
+
+    if (activeNetwork.ETH.url) {
+      this.eth.web3 = new Web3(new Web3.providers.WebsocketProvider(activeNetwork.ETH.url));
+      this.eth.web3.eth.getBlockNumber().then(number =>
+        this.eth.blockNumber = number
+      );
+      } else {
+      delete this.eth.web3;
+    }
 
     this.readySubject.next(null);
     this.readySubject.complete;

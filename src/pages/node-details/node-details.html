@@ -1,0 +1,59 @@
+<ion-header>
+  <header [colorAttr]="'primary-dark'">{{ node.name }}</header>
+</ion-header>
+
+<ion-content padding class="container">
+  <div *ngIf="node">
+    <ion-list>
+      <ion-item>
+        <ion-label>
+          Node
+        </ion-label>
+      </ion-item>
+      <ion-item>
+        <ion-label item-begin>
+          <b>Name</b>
+        </ion-label>
+        <ion-label item-end>MtPelerin's Public</ion-label>
+      </ion-item>
+      <ion-item>
+        <ion-label item-begin>
+          <b>Gas Price</b>
+        </ion-label>
+        <ion-label item-end>{{ node.gasPrice }}</ion-label>
+      </ion-item>
+      <ion-item>
+        <ion-label item-begin>
+          <b>Peer count</b>
+        </ion-label>
+        <ion-label item-end>{{ node.peerCount }}</ion-label>
+      </ion-item>
+    </ion-list>
+
+    <ion-list *ngIf="block">
+      <ion-item>
+        <ion-label>
+          Last block
+        </ion-label>
+      </ion-item>
+      <ion-item>
+        <ion-label item-begin>
+          <b>Mined at</b>
+        </ion-label>
+        <ion-label item-end>{{ block.timestamp }}</ion-label>
+      </ion-item>
+      <ion-item>
+        <ion-label item-begin>
+          <b>Block number</b>
+        </ion-label>
+        <ion-label item-end>{{ block.number }}</ion-label>
+      </ion-item>
+      <ion-item>
+        <ion-label item-begin>
+          <b>Transactions count</b>
+        </ion-label>
+        <ion-label item-end>{{ block.transactions.length }}</ion-label>
+      </ion-item>
+    </ion-list>
+  </div>
+</ion-content>

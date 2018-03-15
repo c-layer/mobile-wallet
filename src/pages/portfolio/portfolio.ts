@@ -46,14 +46,16 @@ export class PortfolioPage {
     if(!this.activeAccount.portfolio) {
       return [];
     }
-    return this.activeAccount.portfolio.filter(item => (item.isCore))
+    return this.accountProvider.getActiveAccountPortfolio()
+      .filter(item => (item.isCore))
   }
 
   getTokens(network) {
     if(!this.activeAccount.portfolio) {
       return [];
     }
-    return this.activeAccount.portfolio.filter(item => (!item.isCore && item.network == network))
+    return this.accountProvider.getActiveAccountPortfolio()
+      .filter(item => (!item.isCore && item.network == network))
   }
 
   doRefresh(refresher) {
@@ -65,7 +67,8 @@ export class PortfolioPage {
             this.loaderProvider.setStatus('PortfolioLoaded');
             this.loaderProvider.endStart();
 
-            this.activeAccount.portfolio.forEach(token => {
+            let portfolio = this.accountProvider.getActiveAccountPortfolio();
+            portfolio.forEach(token => {
               data.forEach(item => {
                 if(item.currency == token.currency && token.isCore) {
                   item.untilBlock = token.untilBlock;
@@ -73,8 +76,9 @@ export class PortfolioPage {
                 }
               });
             });
-            this.activeAccount.portfolio = data;
-            this.profileProvider.setPortfolio(this.activeAccount.portfolio);
+
+            portfolio = data;
+            this.accountProvider.setActiveAccountPortfolio(portfolio);
           }
           if(refresher) {
             refresher.complete();

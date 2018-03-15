@@ -16,7 +16,7 @@ export class Account {
 
   derivationId: number;
 
-  portfolio: AccountToken[];
+  portfolio: { [id : string] : AccountToken[] };
 
   constructor(name: string, type: AccountType, address: string) {
     this.name = name;

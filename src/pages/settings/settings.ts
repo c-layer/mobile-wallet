@@ -9,13 +9,18 @@ import { WalletSecurePage, WalletSecureMode } from '../wallet/wallet-secure/wall
 import { Observable } from 'rxjs/Observable';
 import { Profile } from '../../model/profile';
 import { LoaderProvider } from '../../providers/loader';
+import { NodeDetailsPage } from '../node-details/node-details';
+import { NetworksPage } from './networks/networks';
+import { NetworkProvider } from '../../providers/network';
 
 @Component({
   selector: 'page-settings',
   templateUrl: 'settings.html',
 })
 export class SettingsPage {
-  public hasCache:boolean = false;
+  public activeNetwork = {};
+  public hasCache: boolean = false;
+  public cacheSize: string = '';
   public loadingSteps: any[];
   public profile: Profile = <Profile>{};
   public confirmations: number = 3;
@@ -24,6 +29,7 @@ export class SettingsPage {
     public accountProvider: AccountProvider,
     public loaderProvider: LoaderProvider,
     private alertCtrl: AlertController,
+    private networkProvider: NetworkProvider,
     public navCtrl: NavController, public navParams: NavParams) {
   }
 
@@ -46,10 +52,19 @@ export class SettingsPage {
     });
   }
 
+  goToNodeDetails(nodeName) {
+    this.navCtrl.push(NodeDetailsPage, { nodeName: nodeName });
+  }
+
+  goToNetworks() {
+    this.navCtrl.push(NetworksPage);
+  }
+
   clearCache() {
     this.profileProvider.clearCache().subscribe(() => {
       this.hasCache = false;
-   });    
+      this.cacheSize = 0 + ' Mb';
+    });
   }
 
   clearData() {
@@ -85,10 +100,16 @@ export class SettingsPage {
       this.profileProvider.getProfile() : this.profile;
 
     this.hasCache = false;
+    let cacheSize = 0;
     this.profile.accounts.forEach(account => {
-      if(account.portfolio.length > 0) {
+      if (this.accountProvider.getAccountPortfolio(account).length > 0) {
         this.hasCache = true;
+        let size = JSON.stringify(account.portfolio).length;
+        cacheSize += Math.floor(size / 1024 / 1024 * 100) / 100;
       }
     });
+    this.cacheSize = cacheSize + ' Mb';
+
+    this.activeNetwork = this.networkProvider.getActiveNetworks();
   }
 }

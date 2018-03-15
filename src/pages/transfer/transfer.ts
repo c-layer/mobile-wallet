@@ -31,7 +31,7 @@ export class TransferPage {
   getEstimatedFees() {
     let estimatedFees = '--- GWei';
     if (this.estimatedGas
-      && Number.parseInt(this.selectedTokenBalance) >= this.selectedAmount) {
+      && new Number(this.selectedTokenBalance) >= this.selectedAmount) {
       let fees = (this.selectedGasPrice * this.estimatedGas);
       if (fees > 10 ** 9) {
         estimatedFees = (fees / 10 ** 9) + ' GWei';
@@ -43,17 +43,20 @@ export class TransferPage {
   }
 
   update() {
-    if(this.selectedCurrency) {
-      this.getCurrency().getGasPrice().subscribe((data) => {
-        if (data) {
-          this.selectedGasPrice = data;
-        }
-      });
+    if (this.selectedCurrency) {
+      let currency = this.getCurrency();
+      if (currency) {
+        currency.getGasPrice().subscribe((data) => {
+          if (data) {
+            this.selectedGasPrice = data;
+          }
+        });
+      }
     }
 
     if (this.selectedCurrency) {
       let balance = null;
-      this.activeAccount.portfolio.forEach(token => {
+      this.accountProvider.getActiveAccountPortfolio().forEach(token => {
         if (token.currency + ';' + token.network == this.selectedCurrency) {
           this.selectedTokenBalance = token.balance;
         }
@@ -61,12 +64,11 @@ export class TransferPage {
     }
 
     if (this.selectedAccount && this.selectedCurrency && this.selectedAmount
-      && Number.parseInt(this.selectedTokenBalance) >= this.selectedAmount) {
+      && new Number(this.selectedTokenBalance) >= this.selectedAmount) {
       this.getCurrency().estimateTransfer(this.activeAccount, this.selectedAccount, this.selectedAmount)
         .subscribe((data) => {
           if (data) {
             this.estimatedGas = data;
-            console.log(this.estimatedGas);
           }
         });
     }
@@ -75,7 +77,6 @@ export class TransferPage {
   getCurrency() {
     if (this.selectedCurrency) {
       let data = this.selectedCurrency.split(';');
-      console.log(data);
       if (data.length == 2) {
         return this.currencyProvider.getCurrencyBySymbol(data[1], data[0]);
       }
@@ -114,7 +115,7 @@ export class TransferPage {
   public cannotSubmit() {
     return !this.selectedCurrency || !this.selectedAmount
       || !this.selectedAccount || !this.selectedGasPrice
-      || (Number.parseInt(this.selectedTokenBalance) < this.selectedAmount);
+      || (new Number(this.selectedTokenBalance) < this.selectedAmount);
   }
 
   public scan() {
@@ -122,6 +123,7 @@ export class TransferPage {
   }
 
   public getPositivePortfolio() {
-    return this.activeAccount.portfolio.filter(element => Number.parseInt(element.balance) > 0);
+    return this.accountProvider.getActiveAccountPortfolio()
+      .filter(element => new Number(element.balance) > 0);
   }
 }

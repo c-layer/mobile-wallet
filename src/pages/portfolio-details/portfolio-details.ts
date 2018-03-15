@@ -102,7 +102,16 @@ export class PortfolioDetailsPage {
 
   ionViewWillEnter() {
     this.activeAccount = this.accountProvider.getActiveAccount();
-    this.token = this.navParams.get('token');
+
+    let tokenParam = this.navParams.get('token');
+    let portfolio = this.accountProvider.getActiveAccountPortfolio();
+    portfolio.forEach(portfolioToken => {
+      if ( portfolioToken.currency == tokenParam.currency
+          && portfolioToken.network == tokenParam.network) {
+            this.token = portfolioToken;
+      }
+    });
+
     this.currency = this.currencyProvider.getCurrencyBySymbol(this.token.network, this.token.currency);
     if (this.currency && this.currency.supply != undefined) {
       this.supply = this.currency.supply / 10 ** this.currency.decimal;
@@ -124,7 +133,7 @@ export class PortfolioDetailsPage {
           this.history = this.formatCoreTransactions(result.network, this.token.transactions);
           this.historyReady = true;
 
-          this.profileProvider.setPortfolio(this.activeAccount.portfolio);
+          this.accountProvider.setActiveAccountPortfolio(portfolio);
         }
       });
     } else {

@@ -31,7 +31,13 @@ export class ProfileProvider {
                         tobeSaved = true;
                     }
 
+                    if (!profile.networks) {
+                        profile.networks = this.getDefaultNetworks();
+                        tobeSaved = true;
+                    }
+
                     this.profile = profile;
+                    console.log(profile);
                     if (tobeSaved) {
                         return this.saveProfile();
                     } else {
@@ -53,7 +59,7 @@ export class ProfileProvider {
         return this.profile;
     }
 
-    private saveProfile(): Observable<Profile> {
+    public saveProfile(): Observable<Profile> {
         return Observable.fromPromise(this.storage.set(ProfileProvider.STORAGE_KEY, this.profile)
             .then(() => {
                 console.log('profile saved !');
@@ -63,7 +69,7 @@ export class ProfileProvider {
 
     public clearCache(): Observable<Profile> {
         this.profile.accounts.forEach(account => {
-            account.portfolio = [];
+            account.portfolio = {};
         });
 
         return this.saveProfile();
@@ -85,14 +91,11 @@ export class ProfileProvider {
         this.profile.accounts = (params.accounts) ? params.accounts : [];
         this.profile.encryptedWallet = (params.encryptedWallet) ? params.encryptedWallet : [];
         this.profile.mnemonicIsBackup = (params.mnemonicIsBackup) ? params.mnemonicIsBackup : false;
+        this.profile.networks = this.getDefaultNetworks();
         return this.saveProfile();
     }
 
     public setTokenDirectories(tokenDirectories: Array<string>) {
-        return this.saveProfile();
-    }
-
-    public setPortfolio(portfolio: Array<AccountToken>) {
         return this.saveProfile();
     }
 
@@ -122,4 +125,52 @@ export class ProfileProvider {
         this.profile.settings = settings;
         return this.saveProfile();
     }
+
+    public setNetworks(networks: any) {
+        this.profile.networks = networks;
+        return this.saveProfile();
+    }
+
+    public getDefaultNetworks() {
+        return [
+          {
+              'name': 'Mainnet',
+              'code': 'mainnet',
+              'active': false,
+              'ETH': {
+                  'name': 'Eth MtPelerin',
+                  'url': 'ws://163.172.104.223:1014'
+              },
+              'RSK': {
+                  'name': 'Rsk MtPelerin',
+                  'url': 'http://163.172.104.223:4443'
+              }
+          },
+          {
+              'name': 'Testnet',
+              'code': 'testnet',
+              'active': true,
+              'ETH': {
+                  'name': 'Eth MtPelerin',
+                  'url': 'ws://163.172.104.223:1024'
+              },
+              'RSK': {
+                  'name': 'Rsk MtPelerin',
+                  'url': 'http://163.172.104.223:4444'
+              }
+          },
+          {
+              'name': 'MtPelerin',
+              'code': 'mtpelerin',
+              'active': false,
+              'ETH': {
+                  'name': 'Eth MtPelerin',
+                  'url': 'ws://163.172.104.223:1004'
+              },
+              'RSK': {
+                  'name': 'Rsk MtPelerin',
+                  'url': undefined
+              }
+          }];
+      }    
 }

@@ -23,7 +23,7 @@
       </button>
     </button>
 
-    <ion-item-divider>RSK Tokens</ion-item-divider>
+    <ion-item-divider *ngIf="getTokens('RSK') != false">RSK Tokens</ion-item-divider>
     <button ion-item *ngFor="let token of getTokens('RSK')" (click)="goToDetailsPage(token)"
       class="token">
       <ion-avatar item-start>
@@ -41,7 +41,7 @@
       </button>
     </button>
 
-    <ion-item-divider>ETH Tokens</ion-item-divider>
+    <ion-item-divider *ngIf="getTokens('ETH') != false">ETH Tokens</ion-item-divider>
     <button ion-item *ngFor="let token of getTokens('ETH')" (click)="goToDetailsPage(token)"
       class="token">
       <ion-avatar item-start>

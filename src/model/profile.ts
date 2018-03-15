@@ -4,6 +4,7 @@ export class Profile {
   name: string;
   selected: boolean;
   settings: {  };
+  networks: Array<any>;
 
   tokens: {  };
 

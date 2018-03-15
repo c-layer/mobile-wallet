@@ -12,8 +12,17 @@ page-settings {
         color: color($colors, secondary-dark) !important;      
     }
 
+    button.button-item > div.item-inner {
+        border: none !important;
+    }
+
     .info {
         font-weight: bold;
+    }
+
+    .node {
+        background-color: color($colors, secondary-light) !important;  
+        color: color($colors, secondary-dark) !important;              
     }
 
     .range-tick {

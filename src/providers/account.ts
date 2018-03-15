@@ -17,6 +17,8 @@ import { Web3Provider } from './web3';
 import { Observable } from 'rxjs/Observable';
 import { ProfileProvider } from './profile';
 import { Profile } from '../model/profile';
+import { NetworkProvider } from './network';
+import { AccountToken } from '../model/account-token';
 
 @Injectable()
 export class AccountProvider {
@@ -27,6 +29,7 @@ export class AccountProvider {
     private encryptedWallet: any;
 
     constructor(private web3Provider: Web3Provider,
+        private networkProvider: NetworkProvider,
         private profileProvider: ProfileProvider) {
     }
 
@@ -211,7 +214,7 @@ export class AccountProvider {
 
     public accountCanSend(account: Account, network: string, symbol: string): boolean {
         return account.type == AccountType.HOT
-            && account.portfolio.filter(item => {
+            && this.getAccountPortfolio(account).filter(item => {
                 return item.currency == symbol && item.network == network
                     && Number(item.balance) > 0;
             }).length > 0;
@@ -256,7 +259,6 @@ export class AccountProvider {
 
     public readMnemonic(password: string): string {
         let mnemonicAddress = this.web3Provider.getAccounts().decrypt(this.encryptedMnemonic, password);
-        console.log(mnemonicAddress);
         let ids = mnemonicAddress.privateKey.match(/.{1,3}/g);
         let words = [];
         ids.reverse().forEach(id => {
@@ -267,5 +269,25 @@ export class AccountProvider {
         });
         let mnemonic = words.reverse().join(' ');
         return mnemonic;
+    }
+    
+    public getActiveAccountPortfolio() {
+        return this.getAccountPortfolio(this.activeAccount);
+    }
+
+    public getAccountPortfolio(account: Account) {
+        let activeNetworks = this.networkProvider.getActiveNetworks();
+
+        let portfolio = account.portfolio[activeNetworks.name];
+        if(!portfolio) {
+            portfolio =  [];
+        }
+        return portfolio;
+    }
+
+    public setActiveAccountPortfolio(portfolio: AccountToken[]) {
+        let activeNetworks = this.networkProvider.getActiveNetworks();
+        this.activeAccount.portfolio[activeNetworks.name] = portfolio;
+        this.profileProvider.saveProfile();
     }
 }

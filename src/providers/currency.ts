@@ -159,7 +159,6 @@ export class CurrencyProvider {
                   console.error(error);
                 } else if (data) {
                   transactions.push(data);
-                  console.log(data);
                 }
               });
               currency.contract.events.Transfer({
@@ -171,7 +170,6 @@ export class CurrencyProvider {
                   console.error(error);
                 } else if (data) {
                   transactions.push(data);
-                  console.log(data);
                 }
               });
             }
@@ -276,30 +274,43 @@ export class CurrencyProvider {
           } else {
             return null;
           }
+        }).catch(error => {
+          console.error(error);
         });
         tokens.push(token);
       }
       return tokens;
+    }).catch(error => {
+      console.error(error);
     });
   }
 
   public allCurrenciesObs(): Observable<Array<Currency>> {
-    let rskDirectories = this.profileProvider.getProfile().tokens['RSK'];
-    let ethDirectories = this.profileProvider.getProfile().tokens['ETH'];
 
-    let currenciesPromises = Promise.all([]
-      .concat(ethDirectories.map(directory =>
-        this.getDirectory('ETH', this.web3Provider.getEthProvider(), directory)))
-      .concat(rskDirectories.map(directory =>
-        this.getDirectory('RSK', this.web3Provider.getRskProvider(), directory)))
-    ).then(data => {
-      let tokens = [
+    let directoryPromises = [];
+    let tokens = [];
+    if(this.web3Provider.getEthProvider()) {
+      let ethDirectories = this.profileProvider.getProfile().tokens['ETH'];
+
+      directoryPromises = directoryPromises.concat(ethDirectories.map(directory =>
+        this.getDirectory('ETH', this.web3Provider.getEthProvider(), directory)));
+
+      tokens = tokens.concat(this.getCoreCurrency(this.web3Provider.getEthProvider(),
+      'ETH', 'Ethereum', 'ETH', 'assets/imgs/currencies/ETHER.svg'));
+    }
+
+    if(this.web3Provider.getRskProvider()) {
+      let rskDirectories = this.profileProvider.getProfile().tokens['RSK'];
+
+      directoryPromises = directoryPromises.concat(rskDirectories.map(directory =>
+        this.getDirectory('RSK', this.web3Provider.getRskProvider(), directory)));
+
+      tokens = tokens.concat(
         this.getCoreCurrency(this.web3Provider.getRskProvider(),
-          'RSK', 'SmartBTC', 'SBTC', 'assets/imgs/currencies/RSK.png'),
-        this.getCoreCurrency(this.web3Provider.getEthProvider(),
-          'ETH', 'Ethereum', 'ETH', 'assets/imgs/currencies/ETHER.svg')
-      ];
+          'RSK', 'SmartBTC', 'SBTC', 'assets/imgs/currencies/RSK.png'));
+    }
 
+    let currenciesPromises = Promise.all(directoryPromises).then(data => {
       if (data[0]) {
         tokens = tokens.concat(data[0]);
       }
