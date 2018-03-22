@@ -15,6 +15,9 @@ export class ProfileProvider {
         return Observable.fromPromise(
             this.storage.ready().then(() => this.storage.get(ProfileProvider.STORAGE_KEY))
                 .then(profile => {
+                    if(!profile) {
+                        profile = this.newProfile({});
+                    }
 
                     // FIX 0.1.7
                     let tobeSaved = false;
@@ -24,25 +27,10 @@ export class ProfileProvider {
                     }
 
                     if (!profile.contracts) {
-                        profile.contracts = {
-                            'mainnet': { },
-                            'testnet': {
-                                'RSK': [{
-                                    address: '0x347e70673323bbde4772af6fbbecf7caef084205',
-                                    directory: true
-                                }]
-                            },
-                            'mtpelerin': {
-                                'ETH': [{
-                                    address: '0x73b10223b2318cfb775fbe7bc5781a04c2a0a3cd',
-                                    directory: true
-                                }]
-                            }
-                        }
+                        profile.contracts = this.getDefaultContracts();
                         tobeSaved = true;
                     }
 
-                    console.log(profile.networks);
                     if (!profile.networks) {
                         profile.networks = this.getDefaultNetworks();
                         tobeSaved = true;
@@ -101,6 +89,7 @@ export class ProfileProvider {
         this.profile.accounts = (params.accounts) ? params.accounts : [];
         this.profile.encryptedWallet = (params.encryptedWallet) ? params.encryptedWallet : [];
         this.profile.mnemonicIsBackup = (params.mnemonicIsBackup) ? params.mnemonicIsBackup : false;
+        this.profile.contracts = this.getDefaultContracts();
         this.profile.networks = this.getDefaultNetworks();
         return this.saveProfile();
     }
@@ -139,6 +128,24 @@ export class ProfileProvider {
     public setNetworks(networks: any) {
         this.profile.networks = networks;
         return this.saveProfile();
+    }
+
+    public getDefaultContracts() {
+        return {
+            'mainnet': { },
+            'testnet': {
+                'RSK': [{
+                    address: '0x347e70673323bbde4772af6fbbecf7caef084205',
+                    directory: true
+                }]
+            },
+            'mtpelerin': {
+                'ETH': [{
+                    address: '0x73b10223b2318cfb775fbe7bc5781a04c2a0a3cd',
+                    directory: true
+                }]
+            }
+        };
     }
 
     public getDefaultNetworks() {

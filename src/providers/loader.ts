@@ -49,9 +49,6 @@ export class LoaderProvider {
         this.notificationsProvider.start();
         this.web3Provider.start();
         this.setStatus('web3Loaded');
-
-       // this.accountProvider.addAccount( 
-       // '0x2b509a3f22fcf5890ce908d49ba20520c9cedc458180148b8fd5970606646513', 'token1234', 'External Account');
     }
 
     public start() {

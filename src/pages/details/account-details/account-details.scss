@@ -62,9 +62,7 @@ page-account-details {
     .qrcode > img {
         display: block;
         margin: auto;
-        width: 100%;
-        min-width: 100px;
-        max-width: 220px;
+        max-width: 50%;
     }
 
     .key {
@@ -72,11 +70,31 @@ page-account-details {
         color: color($colors, secondary-light) !important;
         font-size: 10px;
         font-weight: bold;
+        min-height: 20px;
+        max-height: 20px;
+    }
+
+    .key > div.item-inner {
+        min-height: 20px;
+        max-height: 20px;
     }
 
     .actions {
         min-height: 200px;
         max-height: 200px;
+    }
+
+    .actions-list {
+        min-height: 180px;
+        max-height: 180px;
+    }
+
+    ion-list.actions > div > button {
+        margin-bottom: 2px;
+    }
+
+    ion-list.actions > div > button > div.item-inner {
+        border: none;
     }
 
     .input {

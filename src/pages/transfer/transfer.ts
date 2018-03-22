@@ -92,7 +92,8 @@ export class TransferPage {
       let postivePortfolio = this.getPositivePortfolio();
       if(postivePortfolio.length > 0) {
         this.selectedToken = postivePortfolio[0];
-        this.selectedCurrency = this.selectedToken.currency + ';' + this.selectedToken.network;
+        this.selectedCurrency =
+          this.selectedToken.currency + ';' + this.selectedToken.network;
       }
     }
     this.activeAccount = this.accountProvider.getActiveAccount();

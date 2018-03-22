@@ -38,6 +38,7 @@ import { ExplorerProvider } from '../providers/explorer';
 import { NetworksPage } from '../pages/settings/networks/networks';
 import { NodeDetailsPage } from '../pages/node-details/node-details';
 import { BootTimePage } from '../pages/settings/performance/boottime/boottime';
+import { SocialSharing } from '@ionic-native/social-sharing';
 
 @NgModule({
   declarations: [
@@ -101,6 +102,7 @@ import { BootTimePage } from '../pages/settings/performance/boottime/boottime';
     ProfileProvider,
     NetworkProvider,
     NotificationsProvider,
+    SocialSharing,
     StatusBar,
     SplashScreen,
     {provide: ErrorHandler, useClass: IonicErrorHandler},

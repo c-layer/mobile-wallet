@@ -78,8 +78,16 @@ export class Web3Provider {
 
   start() {
     let profile = this.profileProvider.getProfile();
+
+    let networks = null;
+    if(profile && profile.networks) {
+      networks = profile.networks;
+    } else {
+      networks = this.profileProvider.getDefaultNetworks();
+    }
+
     let activeNetwork = null;
-    profile.networks.forEach(network => {
+    networks.forEach(network => {
       if (network.active) {
         activeNetwork = network;
       }

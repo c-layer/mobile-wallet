@@ -6,11 +6,11 @@
   <div *ngIf="activeAccount">
     <ion-list>
       <ion-item no-lines>
-        <ion-label item-begin>
+        <ion-label class="balance-title">
           <b>Balance</b>
         </ion-label>
       </ion-item>
-      <ion-item>
+      <ion-item no-lines class="balance-item">
         <ion-label text-right class="balance">{{ formatProvider.formatAmount(token.balance) }} {{token.currency}}</ion-label>
       </ion-item>
       <ion-item *ngIf="supply != undefined">

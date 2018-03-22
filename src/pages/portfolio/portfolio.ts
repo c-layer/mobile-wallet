@@ -17,6 +17,7 @@ export class PortfolioPage {
   public error: string;
   private activeAccount: Account;
   private portfolioSubscription: Subscription;
+  private refresher: Refresher;
 
   constructor(private navCtrl: NavController, private currencyProvider: CurrencyProvider,
     public accountProvider: AccountProvider, public formatProvider: FormatProvider,
@@ -57,6 +58,7 @@ export class PortfolioPage {
   }
 
   doRefresh(refresher) {
+    this.refresher = refresher;
     if (this.activeAccount) {
       this.loaderProvider.startWeb3();
       this.portfolioSubscription = this.currencyProvider.portfolioObs(this.activeAccount)
@@ -91,7 +93,7 @@ export class PortfolioPage {
     if (!this.activeAccount) {
       this.navCtrl.parent.select(1);
       return;
-    }
+    }   
   }
 
   ionViewDidEnter() {
@@ -99,6 +101,9 @@ export class PortfolioPage {
   }
 
   ionViewWillLeave() {
+    if(this.refresher && this.refresher.state == 'refreshing') {
+      this.refresher.cancel();
+    }
     if (this.portfolioSubscription) {
       this.portfolioSubscription.unsubscribe();
     }

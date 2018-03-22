@@ -29,9 +29,17 @@ page-portfolio-details {
         color: color($colors, danger) !important;
     }
 
+    .balance-item {
+        padding-bottom: 5px;
+    }
+
+    .balance-title {
+        margin-bottom: 0px;
+    }
+
     .balance {
         font: 30px bold;
-        top: -20px;
+        margin-top: 0px;
         position: absolute;
         right: 0px;
     }

@@ -54,7 +54,9 @@ export class ScanPage {
   }
 
   scan() {
-   Observable.fromPromise(this.barcodeScanner.scan()).first().subscribe(
+   Observable.fromPromise(this.barcodeScanner.scan({
+     disableSuccessBeep: true
+   })).first().subscribe(
       (barcodeData: BarcodeScanResult)  => {
         this.detectAddressType(barcodeData.text);
       },

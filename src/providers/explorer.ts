@@ -51,13 +51,14 @@ export class ExplorerProvider {
                 resultValue.transactions.push(tx);
             }
             resultValue.completion++;
+            result.next(resultValue);
         }).catch(err => {
             console.log(web3.currentProvider);
             console.error('For block ' + blockId + ': ', err);
             resultValue.completion++;
             resultValue.errors++;
+            result.next(resultValue);
         });
-        result.next(resultValue);
     }
 
     private exploration(web3, account, result, resultValue,

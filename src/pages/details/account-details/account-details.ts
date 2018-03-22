@@ -1,5 +1,6 @@
-import { Component } from '@angular/core';
+import { Component, ViewChild, ElementRef } from '@angular/core';
 import { NavController, NavParams } from 'ionic-angular';
+import { SocialSharing } from '@ionic-native/social-sharing';
 import { FormatProvider } from '../../../providers/format';
 import { TransferPage } from "../../transfer/transfer";
 import { Account } from '../../../model/account';
@@ -20,8 +21,12 @@ export class AccountDetailsPage {
   scannedCode = null;
   renaming: boolean = false;
 
+  @ViewChild('qrcode')
+  qrcodeImg: ElementRef;
+
   constructor(public formatProvider: FormatProvider,
     public navCtrl: NavController, public navParams: NavParams,
+    private socialSharing: SocialSharing,
     public accountProvider: AccountProvider) {
   }
 
@@ -59,14 +64,33 @@ export class AccountDetailsPage {
       && this.accountProvider.accountCanSend(active);
   }
 
+  shareTo() {
+    let image = null;
+    if (this.qrcodeImg && this.qrcodeImg['qrcElement']) {
+      image = this.qrcodeImg['qrcElement'].nativeElement.firstChild.currentSrc;
+    }
+    this.socialSharing.share(this.account.address, '[MtWallet] My Public Address', 
+      image, 
+      'https://play.google.com/store/apps/details?id=tech.smex.mtpelerin.wallet')
+      .then(result => {
+        this.loading = false;
+        console.log(result);
+      }).catch(error => {
+        this.loading = false;
+        console.error(error);
+      });
+    this.loading = true;
+  }
+
   delete() {
-    this.navCtrl.parent.parent.push(WalletSecurePage, { 
+    this.navCtrl.parent.parent.push(WalletSecurePage, {
       mode: WalletSecureMode.ELEVATE_PRIVS,
       callback: (password) => {
         let profile = this.accountProvider.removeAccount(this.account, password);
         this.navCtrl.remove(1);
         return profile;
-      }})
+      }
+    })
   }
 
   sendTo() {
