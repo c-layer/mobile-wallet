@@ -32,14 +32,14 @@ export class FormatProvider {
         return result;
     }
 
-    formatDate(timestamp: number) {
+    public formatDate(timestamp: number) {
         if(timestamp==null || timestamp==undefined) return;
 
         let date = new Date(timestamp);
 
         let digits2 = (i: number) => i < 10 ? "0" + i : i;
 
-        return date.getFullYear() + '-' + digits2(date.getMonth()) + '-' + digits2(date.getDay())
+        return date.getFullYear() + '-' + digits2(date.getMonth()+1) + '-' + digits2(date.getDay()+1)
             + ' ' + digits2(date.getHours())
             + ':' + digits2(date.getMinutes())
             + ':' + digits2(date.getSeconds());

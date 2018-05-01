@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { NavController, NavParams } from 'ionic-angular';
 import { ProfileProvider } from '../../providers/profile';
 import { NetworkProvider } from '../../providers/network';
+import { FormatProvider } from '../../providers/format';
 
 @Component({
   selector: 'page-node-details',
@@ -12,7 +13,8 @@ export class NodeDetailsPage {
   public block: any;
 
   constructor(private navCtrl: NavController, private navParams: NavParams,
-    private profileProvider: ProfileProvider, private networkProvider: NetworkProvider) { }
+    private profileProvider: ProfileProvider, private networkProvider: NetworkProvider,
+    public formatProvider : FormatProvider) { }
 
   ionViewWillEnter() {
     let nodeName = this.navParams.get('nodeName');

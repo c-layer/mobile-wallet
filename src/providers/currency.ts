@@ -58,38 +58,6 @@ export class CurrencyProvider {
   }
 
   public portfolioObs(account: Account): Observable<AccountToken[]> {
-    /*console.log(this.web3Provider.encodeAddress(account.address));
-    this.web3Provider.getRskProvider().eth.getPastLogs(
-      { 
-        fromBlock: 'earliest', //this.web3Provider.getRskProvider().utils.toHex(152896),
-        toBlock: 'latest', //this.web3Provider.getRskProvider().utils.toHex(153896),
-        address: '0x0000000000000000000000000000000001000006',
-        topics: [ '0x00000000000000007570646174655f636f6c6c656374696f6e735f746f706963', null, null, null]
-//        topics: [null, this.web3Provider.encodeAddress(account.address), null, null]
-      },
-      (err, data) => { 
-        console.log(err);
-        let count = {};
-        data.forEach(log  => {
-          if(count[log.data]) {
-            count[log.data] += 1;
-          } else {
-            count[log.data] = 1;
-          }
-        });
-        Object.keys(count).forEach( item => {
-          let address = '0x' + item.substring(4);
-            this.web3Provider.getRskProvider().eth.getBalance(address)
-          .then(value => console.log(address + ' = ' + 
-            this.web3Provider.getRskProvider().utils.fromWei(value, 'ether')));
-        });
-//        Object.keys(count).forEach( item => console.log(item + ' = '+ count[item]));
-      });
-
-//    this.web3Provider.getRskProvider().eth.getCode(
-//      '0x0000000000000000000000000000000001000006',
-//      (err, data) => { console.log('test'); console.log(data); });*/
-
     return this.allCurrenciesObs().flatMap(currencies => {
       if (currencies.length == 0) return Observable.of([]);
       return Observable.forkJoin(currencies.map(currency => {
@@ -113,42 +81,6 @@ export class CurrencyProvider {
             let transactions = [];
 
             if (currency.network == 'RSK' && currency.symbol == 'GBP') {
-              /*              currency.contract.events.Transfer({
-                              fromBlock: 0,
-                              //   toBlock: null,
-                              topics: [null, this.web3Provider.encodeAddress(account.address), null]
-                            }).subscribe((error, data) => {
-                              if (error) {
-                                console.error(error);
-                              } else if (data) {
-                                transactions.push(data);
-                                console.log(data);
-                              }
-                            });*/
-
-              /*              this.web3Provider.getRskProvider().currentProvider.send({
-                              jsonrpc: '2.0',
-                              id: '2',
-                              method: 'eth_getLogs',
-                              params: [{
-                                fromBlock: "0x26280",
-                                toBlock: "0x26290",
-                                address: currency.address,
-                                topics: ['0x8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e0', null,
-                                  this.web3Provider.encodeAddress(account.address)]
-                              }]
-                            }, (err, data) => {
-                              if (err) {
-                                console.error(err);
-                              } else {
-                                console.log(data.result[0].transactionHash);
-                                this.web3Provider.getRskProvider().eth.getTransaction(data.result[0].transactionHash,
-                                  (err, data) => {
-                                  console.log(data);
-                                });
-                                console.log(data);
-                              }
-                            });  */
             }
 
             if (currency.network == 'ETH') {

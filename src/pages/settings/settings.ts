@@ -103,13 +103,15 @@ export class SettingsPage {
 
     this.hasCache = false;
     let cacheSize = 0;
-    this.profile.accounts.forEach(account => {
-      if (this.accountProvider.getAccountPortfolio(account).length > 0) {
-        this.hasCache = true;
-        let size = JSON.stringify(account.portfolio).length;
-        cacheSize += Math.floor(size / 1024 / 1024 * 100) / 100;
-      }
-    });
+    if (this.profile.accounts) {
+      this.profile.accounts.forEach(account => {
+        if (this.accountProvider.getAccountPortfolio(account).length > 0) {
+          this.hasCache = true;
+          let size = JSON.stringify(account.portfolio).length;
+          cacheSize += Math.floor(size / 1024 / 1024 * 100) / 100;
+        }
+      });
+    }
     this.cacheSize = cacheSize.toString().substr(0, 4) + ' Mb';
 
     this.activeNetwork = this.networkProvider.getActiveNetworks();

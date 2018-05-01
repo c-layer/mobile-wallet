@@ -19,7 +19,6 @@ export class ProfileProvider {
                         profile = this.newProfile({});
                     }
 
-                    // FIX 0.1.7
                     let tobeSaved = false;
                     if (typeof (profile.mnemonicIsBackup) != "boolean") {
                         profile.mnemonicIsBackup = false;
@@ -31,6 +30,7 @@ export class ProfileProvider {
                         tobeSaved = true;
                     }
 
+                    //profile.networks = this.getDefaultNetworks();
                     if (!profile.networks) {
                         profile.networks = this.getDefaultNetworks();
                         tobeSaved = true;
@@ -153,27 +153,27 @@ export class ProfileProvider {
           {
               'name': 'Mainnet',
               'code': 'mainnet',
-              'active': true,
+              'active': false,
               'ETH': {
                   'name': 'Eth MtPelerin',
-                  'url': 'ws://163.172.104.223:1014'
+                  'url': 'ws://mainnet-eth.mtpelerin.com:8546'
               },
               'RSK': {
                   'name': 'Rsk MtPelerin',
-                  'url': 'http://163.172.104.223:4443'
+                  'url': 'http://mainnet-rsk.mtpelerin.com:4444'
               }
           },
           {
               'name': 'Testnet',
               'code': 'testnet',
-              'active': false,
+              'active': true,
               'ETH': {
                   'name': 'Eth MtPelerin',
-                  'url': 'ws://163.172.104.223:1024'
+                  'url': 'ws://testnet-eth.mtpelerin.com:8544'
               },
               'RSK': {
                   'name': 'Rsk MtPelerin',
-                  'url': 'http://163.172.104.223:4444'
+                  'url': 'http://testnet-rsk.mtpelerin.com:4443'
               }
           },
           {
