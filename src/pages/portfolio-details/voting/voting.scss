@@ -1,0 +1,44 @@
+page-voting {
+    ion-title > *, ion-header ion-icon.back-button-icon.icon {  
+        color: color($colors, primary-light) !important;
+    }
+
+    .container {
+        background-color: color($colors, secondary-light) !important;
+    }
+    
+    ion-item {
+        background-color: color($colors, light) !important;  
+        color: color($colors, secondary-dark) !important;      
+    }
+
+    div.item-inner {
+        border-color: color($colors, secondary) !important;
+    }
+
+    .balance-item {
+        padding-bottom: 5px;
+    }
+
+    .balance-title {
+        margin-bottom: 0px;
+    }
+
+    .balance {
+        font: 30px bold;
+        margin-top: 0px;
+        position: absolute;
+        right: 0px;
+    }
+
+    .result {
+        font: 30px bold;
+    }
+
+    .approvals {
+        color: color($colors, valid) !important;
+    }
+    .rejections {
+        color: color($colors, danger) !important;
+    }
+}

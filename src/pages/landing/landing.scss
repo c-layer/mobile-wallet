@@ -1,6 +1,6 @@
 page-landing {
     .container {
-        background-color: color($colors, primary-dark);
+        background-color: color($colors, secondary-dark);
     }
 
     .container > div > div {
@@ -43,13 +43,15 @@ page-landing {
 
     button.button {
         flex: 1 auto;
-        background-color: color($colors, secondary-dark);
-        color: color($colors, light);
+        font-weight: bold;
+        background-color: color($colors,primary);
+        color: color($colors, primary-dark);
         border-color: color($colors, secondary-light);
     }
 
     button.outline {
-        background-color: color($colors, primary-dark);
+        background-color: color($colors, secondary-dark);
+        color: color($colors, secondary-light);
     }
 
     button.button:hover {

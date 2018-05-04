@@ -23,6 +23,11 @@ page-wallet-secure {
         align-self: flex-start;
     }
 
+    div.reminder {
+        padding-top: 40px;
+        font-weight: bold;
+    }
+
     div.reminder > p {
         color: color($colors, light);
         text-align: center;

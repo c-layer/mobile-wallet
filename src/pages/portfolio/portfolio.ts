@@ -8,6 +8,8 @@ import { CurrencyProvider } from "../../providers/currency";
 import { FormatProvider } from "../../providers/format";
 import { LoaderProvider } from '../../providers/loader';
 import { Subscription } from 'rxjs/Subscription';
+import { ContractProvider } from '../../providers/contract';
+import { VotingPage } from '../portfolio-details/voting/voting';
 
 @Component({
   selector: 'page-portfolio',
@@ -17,11 +19,12 @@ export class PortfolioPage {
   public error: string;
   private activeAccount: Account;
   private portfolioSubscription: Subscription;
+  private contractSubscription: Subscription;
   private refresher: Refresher;
 
   constructor(private navCtrl: NavController, private currencyProvider: CurrencyProvider,
     public accountProvider: AccountProvider, public formatProvider: FormatProvider,
-    private loaderProvider: LoaderProvider) {
+    private loaderProvider: LoaderProvider, private contractProvider: ContractProvider) {
   }
 
   activeAccountCanSend(token) {
@@ -32,6 +35,10 @@ export class PortfolioPage {
     return this.formatProvider.formatAmount(token.balance) + ' ' + token.currency;
   }
 
+  activeAccountIsKyc(token) {
+    return token.isKyc;
+  }
+
   startTransfer(token, event: FocusEvent) {
     event.stopPropagation();
     this.navCtrl.parent.parent.push(TransferPage, { token: token });
@@ -39,6 +46,12 @@ export class PortfolioPage {
 
   goToDetailsPage(token) {
     this.navCtrl.push(PortfolioDetailsPage, { token: token });
+  }
+
+  goToContractDetailsPage(contract) {
+    if(contract.share) {
+      this.navCtrl.push(VotingPage, { contract: contract });
+    }
   }
 
   getCore() {
@@ -54,7 +67,24 @@ export class PortfolioPage {
       return [];
     }
     return this.accountProvider.getActiveAccountPortfolio()
-      .filter(item => (!item.isCore && item.network == network))
+      .filter(item => (!item.isCore && item.network == network));
+  }
+
+  getContracts(network) {
+    if(!this.activeAccount.contracts) {
+      return [];
+    }
+    return this.accountProvider.getActiveAccountContracts().filter(item =>
+      (item));
+  }
+
+  canVote(contract) {
+    if(contract && contract.vote) {
+      let vote = contract.vote;
+      let now = new Date().getTime();
+      return (vote.startedAt < now && vote.closedAt > now );
+    }
+    return false;
   }
 
   doRefresh(refresher) {
@@ -84,6 +114,11 @@ export class PortfolioPage {
             refresher.complete();
           }
         });
+        this.contractSubscription = this.contractProvider.contractsObs(this.activeAccount)
+          .first().subscribe(data => {
+            let contracts = data;
+            this.accountProvider.setActiveAccountContracts(contracts);
+          });
     }
   }
 
@@ -106,6 +141,9 @@ export class PortfolioPage {
     }
     if (this.portfolioSubscription) {
       this.portfolioSubscription.unsubscribe();
+    }
+    if(this.contractSubscription) {
+      this.contractSubscription.unsubscribe();
     }
   }
 }

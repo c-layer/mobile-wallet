@@ -7,6 +7,8 @@ import { Account } from '../model/account';
 @Injectable()
 export class ProfileProvider {
     private static STORAGE_KEY = 'mtpelerin';
+    private static MIN_VERSION = '0.1.12';
+    private static CURRENT_VERSION = '0.1.13';
     private profile: Profile;
 
     constructor(private storage: Storage) { }
@@ -15,24 +17,15 @@ export class ProfileProvider {
         return Observable.fromPromise(
             this.storage.ready().then(() => this.storage.get(ProfileProvider.STORAGE_KEY))
                 .then(profile => {
-                    if(!profile) {
-                        profile = this.newProfile({});
+                    if (profile && this.getNumVersion(profile.version) < this.getNumVersion(ProfileProvider.MIN_VERSION)) {
+                        this.clearProfile();
+                        profile = null;
                     }
 
                     let tobeSaved = false;
-                    if (typeof (profile.mnemonicIsBackup) != "boolean") {
-                        profile.mnemonicIsBackup = false;
-                        tobeSaved = true;
-                    }
-
-                    if (!profile.contracts) {
-                        profile.contracts = this.getDefaultContracts();
-                        tobeSaved = true;
-                    }
-
-                    //profile.networks = this.getDefaultNetworks();
-                    if (!profile.networks) {
+                    if(this.getNumVersion(profile.version) != this.getNumVersion(ProfileProvider.CURRENT_VERSION)) {
                         profile.networks = this.getDefaultNetworks();
+                        profile.contracts = this.getDefaultContracts();
                         tobeSaved = true;
                     }
 
@@ -58,6 +51,7 @@ export class ProfileProvider {
     }
 
     public saveProfile(): Observable<Profile> {
+        console.log(this.profile);
         return Observable.fromPromise(this.storage.set(ProfileProvider.STORAGE_KEY, this.profile)
             .then(() => {
                 console.log('profile saved !');
@@ -68,7 +62,15 @@ export class ProfileProvider {
     public clearCache(): Observable<Profile> {
         this.profile.accounts.forEach(account => {
             account.portfolio = {};
+            account.contracts = {};
         });
+
+        return this.saveProfile();
+    }
+
+    public resetConfig(): Observable<Profile> {
+        this.profile.contracts = this.getDefaultContracts();
+        this.profile.networks = this.getDefaultNetworks();
 
         return this.saveProfile();
     }
@@ -86,6 +88,7 @@ export class ProfileProvider {
     public newProfile(params: any): Observable<Profile> {
         this.profile = new Profile();
         this.profile.name = 'default';
+        this.profile.version = ProfileProvider.CURRENT_VERSION;
         this.profile.accounts = (params.accounts) ? params.accounts : [];
         this.profile.encryptedWallet = (params.encryptedWallet) ? params.encryptedWallet : [];
         this.profile.mnemonicIsBackup = (params.mnemonicIsBackup) ? params.mnemonicIsBackup : false;
@@ -132,58 +135,71 @@ export class ProfileProvider {
 
     public getDefaultContracts() {
         return {
-            'mainnet': { },
+            'mainnet': {},
             'testnet': {
-                'RSK': [{
-                    address: '0x347e70673323bbde4772af6fbbecf7caef084205',
-                    directory: true
-                }]
-            },
-            'mtpelerin': {
                 'ETH': [{
-                    address: '0x73b10223b2318cfb775fbe7bc5781a04c2a0a3cd',
-                    directory: true
-                }]
-            }
+                    address: '0x2aa1748af2c3b927670a1548e660afeadc316f71' ,
+                    name: 'Mt Pelerin',
+                    types: [2, 1, 0, 0, 0, 0]
+                },{
+                    address: '0x7118b1087643df9978dbb385d9321b210ef838fb',
+                    name: 'Mt Pelerin\'s Share',
+                    types: [1, 1, 1, 2, 2, 2]
+                }],
+            },
+            'mtpelerin': {}
         };
     }
 
     public getDefaultNetworks() {
         return [
-          {
-              'name': 'Mainnet',
-              'code': 'mainnet',
-              'active': false,
-              'ETH': {
-                  'name': 'Eth MtPelerin',
-                  'url': 'ws://mainnet-eth.mtpelerin.com:8546'
-              },
-              'RSK': {
-                  'name': 'Rsk MtPelerin',
-                  'url': 'http://mainnet-rsk.mtpelerin.com:4444'
-              }
-          },
-          {
-              'name': 'Testnet',
-              'code': 'testnet',
-              'active': true,
-              'ETH': {
-                  'name': 'Eth MtPelerin',
-                  'url': 'ws://testnet-eth.mtpelerin.com:8544'
-              },
-              'RSK': {
-                  'name': 'Rsk MtPelerin',
-                  'url': 'http://testnet-rsk.mtpelerin.com:4443'
-              }
-          },
-          {
-              'name': 'MtPelerin',
-              'code': 'mtpelerin',
-              'active': false,
-              'ETH': {
-                  'name': 'Eth MtPelerin',
-                  'url': 'ws://163.172.104.223:1004'
-              }
-          }];
-      }    
+            {
+                'name': 'Mainnet',
+                'code': 'mainnet',
+                'active': false,
+                'ETH': {
+                    'name': 'Eth - Mt Pelerin',
+                    'url': 'ws://mainnet-eth.mtpelerin.com:8546'
+                },
+                'RSK': {
+                    'name': 'Rsk - Mt Pelerin',
+                    'url': 'http://mainnet-rsk.mtpelerin.com:4444'
+                }
+            },
+            {
+                'name': 'Testnet',
+                'code': 'testnet',
+                'active': true,
+                'ETH': {
+                    'name': 'Eth MtPelerin',
+                    'url': 'ws://testnet-eth.mtpelerin.com:8544'
+                },
+                'RSK': {
+                    'name': 'Rsk MtPelerin',
+                    'url': 'http://testnet-rsk.mtpelerin.com:4443'
+                }
+            },
+            {
+                'name': 'MtPelerin',
+                'code': 'mtpelerin',
+                'active': false,
+                'ETH': {
+                    'name': 'Eth MtPelerin',
+                    'url': 'ws://163.172.104.223:1004'
+                }
+            }];
+    }
+
+    public getNumVersion(version: string): number {
+        if (version == undefined || version.indexOf('.') == -1) {
+            return 0;
+        }
+        const versions = version.split('.');
+        let result = 0;
+        for (var i = 0; i < versions.length; i++) {
+            result = result + 10 ** (2 * i) * Number(versions[i]);
+        }
+
+        return result;
+    }
 }

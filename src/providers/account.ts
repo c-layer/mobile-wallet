@@ -19,6 +19,7 @@ import { ProfileProvider } from './profile';
 import { Profile } from '../model/profile';
 import { NetworkProvider } from './network';
 import { AccountToken } from '../model/account-token';
+import { Contract } from '../model/contract';
 
 @Injectable()
 export class AccountProvider {
@@ -44,7 +45,7 @@ export class AccountProvider {
         this.encryptedMnemonic = profile.encryptedMnemonic;
         this.derivationUsed = profile.derivationUsed;
         this.encryptedWallet = profile.encryptedWallet;
-   }
+    }
 
     public unlock(password: string): Observable<boolean> {
         return Observable.fromPromise(new Promise((resolve, reject) => {
@@ -277,7 +278,7 @@ export class AccountProvider {
         let mnemonic = words.reverse().join(' ');
         return mnemonic;
     }
-    
+
     public getActiveAccountPortfolio() {
         return this.getAccountPortfolio(this.activeAccount);
     }
@@ -285,20 +286,48 @@ export class AccountProvider {
     public getAccountPortfolio(account: Account) {
         let activeNetworks = this.networkProvider.getActiveNetworks();
 
-        if(!account.portfolio) {
+        if (!account.portfolio) {
             account.portfolio = {};
         }
 
         let portfolio = account.portfolio[activeNetworks.name];
-        if(!portfolio) {
-            portfolio =  [];
+        if (!portfolio) {
+            portfolio = [];
         }
         return portfolio;
+    }
+
+    public getActiveAccountContracts() {
+        return this.getAccountContracts(this.activeAccount);
+    }
+
+    public getAccountContracts(account: Account) {
+        let activeNetworks = this.networkProvider.getActiveNetworks();
+
+        if (!account.contracts) {
+            account.contracts = {};
+        }
+
+        let contracts = account.contracts[activeNetworks.name];
+        if (!contracts) {
+            contracts = [];
+        }
+        return contracts;
     }
 
     public setActiveAccountPortfolio(portfolio: AccountToken[]) {
         let activeNetworks = this.networkProvider.getActiveNetworks();
         this.activeAccount.portfolio[activeNetworks.name] = portfolio;
-        this.profileProvider.saveProfile();
+        return this.profileProvider.saveProfile();
+    }
+
+    public setActiveAccountContracts(contracts: Contract[]) {
+        let activeNetworks = this.networkProvider.getActiveNetworks();
+
+        if(!this.activeAccount.contracts) {
+            this.activeAccount.contracts = {};
+        }
+        this.activeAccount.contracts[activeNetworks.name] = contracts;
+        return this.profileProvider.saveProfile();
     }
 }

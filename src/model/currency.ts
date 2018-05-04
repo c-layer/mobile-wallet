@@ -13,6 +13,7 @@ export class Currency {
   image: string;
   isCore: boolean;
   balanceOf(account: Account): Observable<number> { return null; };
+  isKyc(account: Account): Observable<boolean> { return null; };
   history(account: Account, start: number): BehaviorSubject<any> { return null; };
   transfer(sender: Account, password: string,
     beneficiaryAddress: string, amount: number): Observable<any> { return null; }

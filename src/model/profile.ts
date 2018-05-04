@@ -2,6 +2,7 @@ import { Account } from '../model/account';
 
 export class Profile {
   name: string;
+  version: string;
   selected: boolean;
   settings: {  };
   networks: Array<any>;

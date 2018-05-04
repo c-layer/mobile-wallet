@@ -6,4 +6,5 @@ export class AccountToken {
     untilBlock: number;
     transactions: any[];
     isCore: boolean;
+    isKyc: boolean;
 }

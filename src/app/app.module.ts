@@ -39,6 +39,8 @@ import { NetworksPage } from '../pages/settings/networks/networks';
 import { NodeDetailsPage } from '../pages/node-details/node-details';
 import { BootTimePage } from '../pages/settings/performance/boottime/boottime';
 import { SocialSharing } from '@ionic-native/social-sharing';
+import { ContractProvider } from '../providers/contract';
+import { VotingPage } from '../pages/portfolio-details/voting/voting';
 
 @NgModule({
   declarations: [
@@ -56,6 +58,7 @@ import { SocialSharing } from '@ionic-native/social-sharing';
     SuccessPage,
     TabsPage,
     TransferPage,
+    VotingPage,
     WalletBackupPage,
     WalletCreationPage,
     WalletDetailsPage,
@@ -86,6 +89,7 @@ import { SocialSharing } from '@ionic-native/social-sharing';
     TransferPage,
     TabsPage,
     TransferPage,
+    VotingPage,
     WalletBackupPage,
     WalletCreationPage,
     WalletDetailsPage,
@@ -96,6 +100,7 @@ import { SocialSharing } from '@ionic-native/social-sharing';
     AccountProvider,
     BarcodeScanner,
     CurrencyProvider,
+    ContractProvider,
     ExplorerProvider,
     FormatProvider,
     LoaderProvider,

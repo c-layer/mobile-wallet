@@ -1,5 +1,5 @@
 <ion-header>
-  <header [colorAttr]="'primary-dark'">Accounts</header>
+  <header [colorAttr]="'secondary-dark'">Accounts</header>
 </ion-header>
 
 
@@ -16,7 +16,7 @@
       <h2 class="account-name">{{account.name}}</h2>
       <ion-icon *ngIf="hasPrivateKey(account)" name="key" item-end></ion-icon>
       <button ion-button item-end class="action" (click)="goToDetailsPage($event, account)">
-        QRCode
+        More
       </button>
     </button>
     <ion-item-divider color="secondary-dark" *ngIf="hasExternalAccounts()">External Account</ion-item-divider>
@@ -27,7 +27,7 @@
         <h2 class="account-name">{{account.name}}</h2>
         <ion-icon *ngIf="hasPrivateKey(account)" name="key" item-end></ion-icon>
         <button ion-button item-end class="action qrcode" (click)="goToDetailsPage($event, account)">
-          QRCode
+          More
         </button>
       </button>  
   </ion-list>

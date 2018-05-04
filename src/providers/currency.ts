@@ -1,6 +1,3 @@
-declare function require(moduleName: string): any;
-const MtPelerinTokens = require('../assets/contracts/MtPelerinTokens.json');
-const FiatToken = require('../assets/contracts/FiatToken.json');
 
 import { Injectable } from '@angular/core';
 import { Web3Provider } from './web3';
@@ -14,6 +11,7 @@ import { AccountProvider } from './account';
 import { AccountToken } from '../model/account-token';
 import { ExplorerProvider } from './explorer';
 import { NetworkProvider } from './network';
+import { ContractType } from '../model/contract';
 
 @Injectable()
 export class CurrencyProvider {
@@ -60,7 +58,7 @@ export class CurrencyProvider {
   public portfolioObs(account: Account): Observable<AccountToken[]> {
     return this.allCurrenciesObs().flatMap(currencies => {
       if (currencies.length == 0) return Observable.of([]);
-      return Observable.forkJoin(currencies.map(currency => {
+      return Observable.forkJoin(currencies.filter(currency => !!currency).map(currency => {
         if (currency.contract == null) {
           return currency.balanceOf(account).map(balance => {
             let transactions = [];
@@ -73,11 +71,15 @@ export class CurrencyProvider {
               balance: balance.toString(),
               untilBlock: null,
               transactions: transactions,
-              isCore: currency.isCore
+              isCore: currency.isCore,
+              isKyc: false
             }
           });
         } else {
-          return currency.balanceOf(account).map(balance => {
+          let balanceObs = currency.balanceOf(account);
+          let isKycObs = currency.isKyc(account);
+          
+          return Observable.zip(balanceObs, isKycObs, (balance, isKyc) => {
             let transactions = [];
 
             if (currency.network == 'RSK' && currency.symbol == 'GBP') {
@@ -115,7 +117,8 @@ export class CurrencyProvider {
               balance: balance + '',
               untilBlock: null,
               transactions: transactions,
-              isCore: currency.isCore
+              isCore: currency.isCore,
+              isKyc: isKyc
             };
           });
         }
@@ -133,6 +136,7 @@ export class CurrencyProvider {
         .then(account => web3.eth.getBalance(account.address)
           .then(balance =>
             web3.utils.fromWei(balance, 'ether')))),
+      isKyc: (account: Account) => Observable.of(false),
       history: (account: Account, start = 0) =>
         this.explorerProvider.findCoreTransactions(web3, network, account, start),
       transfer: (sender: Account, password: string,
@@ -153,24 +157,28 @@ export class CurrencyProvider {
     });
   }
 
-  private getDirectory(network, web3, directoryAddress): Promise<Currency>[] {
-    let directory = new web3.eth.Contract(MtPelerinTokens.abi, directoryAddress);
-    return directory.methods.getCurrencyCount().call().then(count => {
+  private getRegistry(network, web3, directoryConfig): Promise<Currency>[] {
+    let directory = new web3.eth.Contract(ContractType.getRegistry().abi, directoryConfig.address);
+
+    return directory.methods.addressCount().call().then(count => {
       let tokens = [];
-      for (var i = 1; i <= count; i++) {
-        let token: Promise<Currency> = directory.methods.getCurrencyById(i).call().then(address => {
-          let contract = new web3.eth.Contract(FiatToken.abi, address);
+      for (let i=0; i < count; i++) {
+        let type = (i < directoryConfig.types.length) ? directoryConfig.types[i] : 0;
+        if ([0, 1].indexOf(type) == -1) { continue; }
+        let token: Promise<Currency> = directory.methods.addressById(i).call().then(address => {
+          let contract = new web3.eth.Contract(ContractType.getDemoToken().abi, address);
           if (contract) {
             let methods = contract.methods;
-            let decimal = 2;
-            return Promise.all([
+            let promises = [
               methods.name().call(),
-              methods.symbol().call()
-                .then(symbol => web3.utils.toAscii(symbol)),
+              methods.symbol().call(),
               methods.totalSupply().call(),
-            ]).then(details => <Currency>{
+              methods.decimals().call()
+            ];
+            
+            return Promise.all(promises).then(details => <Currency>{
               name: details[0],
-              decimal: decimal,
+              decimal: details[3],
               network: network,
               address: address,
               contract: contract,
@@ -184,11 +192,21 @@ export class CurrencyProvider {
                     .then(balance => balance / 10 ** this.decimal)
                   ));
               },
+              isKyc: function( account: Account ) {
+                let contractType = ContractType.getContractType(directoryConfig.types[i]);
+                if(contractType.kyc) {
+                  return Observable.fromPromise(Promise.resolve(account)
+                    .then(account => this.contract.methods.isKYCValid(account.address).call().then(isKyc => {
+                      return isKyc;
+                    })));
+                }
+                return Observable.of(true);
+              },
               history: function (account: Account, start: number) { },
               transfer: (sender: Account, password: string, beneficiaryAddress: string,
                 amount: number) => {
                 console.log(amount + ' ' + details[1] + ' to ' + beneficiaryAddress);
-                let cents = amount * (10 ** decimal);
+                let cents = amount * (10 ** details[3]);
                 let contractData = methods.transfer(beneficiaryAddress, cents).encodeABI();
                 return this.accountProvider.getPrivateKey(sender, password)
                   .flatMap(privateKey =>
@@ -196,7 +214,7 @@ export class CurrencyProvider {
                       sender.address, privateKey, address, null, contractData));
               },
               estimateTransfer: (sender: Account, beneficiaryAddress: string, amount: number) => {
-                let cents = amount * (10 ** decimal);
+                let cents = amount * (10 ** details[3]);
                 return Observable.fromPromise(methods.transfer(beneficiaryAddress, cents).estimateGas(
                   { from: sender.address, to: beneficiaryAddress, value: 0 }
                 ));
@@ -209,9 +227,12 @@ export class CurrencyProvider {
             return null;
           }
         }).catch(error => {
+          console.log('Invalid address for id='+i + ' with directory='+directory._address);
           console.error(error);
         });
-        tokens.push(token);
+        if (token) {
+          tokens.push(token);
+        }
       }
       return tokens;
     }).catch(error => {
@@ -230,11 +251,8 @@ export class CurrencyProvider {
 
     if (this.web3Provider.getEthProvider()) {
       if (contracts['ETH']) {
-        let ethDirectories = contracts['ETH']
-          .filter(contract => contract.directory)
-          .map(contract => contract.address);
-        directoryPromises = directoryPromises.concat(ethDirectories.map(directory =>
-          this.getDirectory('ETH', this.web3Provider.getEthProvider(), directory)));
+        directoryPromises = directoryPromises.concat(contracts['ETH'].map(directory =>
+          this.getRegistry('ETH', this.web3Provider.getEthProvider(), directory)));
       }
 
       tokens = tokens.concat(this.getCoreCurrency(this.web3Provider.getEthProvider(),
@@ -246,9 +264,9 @@ export class CurrencyProvider {
         let rskDirectories = contracts['RSK']
           .filter(contract => contract.directory)
           .map(contract => contract.address);
-        directoryPromises = directoryPromises.concat(rskDirectories.map(directory =>
-          this.getDirectory('RSK', this.web3Provider.getRskProvider(), directory)));
-      }
+          directoryPromises = directoryPromises.concat(contracts['RSK'].map(directory =>
+            this.getRegistry('RSK', this.web3Provider.getEthProvider(), directory)));
+        }
 
       tokens = tokens.concat(
         this.getCoreCurrency(this.web3Provider.getRskProvider(),
@@ -256,13 +274,11 @@ export class CurrencyProvider {
     }
 
     let currenciesPromises = Promise.all(directoryPromises).then(data => {
-      if (data[0]) {
-        tokens = tokens.concat(data[0]);
+      for(let i = 0; i < data.length ; i++) {
+        if (data[i]) {
+          tokens = tokens.concat(data[i]);
+        }
       }
-      if (data[1]) {
-        tokens = tokens.concat(data[1])
-      }
-
       return Promise.all(tokens);
     });
 

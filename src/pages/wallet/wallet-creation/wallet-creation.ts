@@ -7,6 +7,7 @@ import { SuccessPage } from '../../success/success';
 import { ProfileProvider } from '../../../providers/profile';
 import { Scheduler } from 'rxjs';
 import { Observable } from 'rxjs/Observable';
+import { CurrencyProvider } from '../../../providers/currency';
 
 export enum WalletCreationMode {
   GENERATE, RECOVER
@@ -35,6 +36,7 @@ export class WalletCreationPage {
 
   constructor(private profileProvider: ProfileProvider,
     private accountProvider: AccountProvider,
+    private currencyProvider: CurrencyProvider,
     private navCtrl: NavController, private navParams: NavParams) { }
 
   createProfile() {
@@ -51,6 +53,13 @@ export class WalletCreationPage {
         console.log('Wallet created !');
         this.loadingMessage = 'adding first account...';
         return this.accountProvider.addAccount(null, this.password, 'Main Account');
+      }).flatMap(account => {
+        console.log('Fetching first account data');
+        this.loadingMessage = 'Fetching first account data...';
+         return this.currencyProvider.portfolioObs(account);
+      }).flatMap(portfolio => {
+        this.loadingMessage = 'Persisting profile...';
+          return this.accountProvider.setActiveAccountPortfolio(portfolio);
       }).catch(error => {
         console.error('Error found : '+error);
         this.error = error;
@@ -61,8 +70,8 @@ export class WalletCreationPage {
           this.loadingMessage = 'finishing...';
           this.navCtrl.push(SuccessPage, {
             message: (this.mode == WalletCreationMode.RECOVER) ?
-              'Your account was recovered successfully !' :
-              'Your account was created successfully !',
+              'Your account was successfully recovered !' :
+              'Your account was successfully created !',
             target: TabsPage
           });
         } else {

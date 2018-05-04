@@ -1,4 +1,5 @@
 import { AccountToken } from "./account-token";
+import { Contract } from "./contract";
 
 export enum AccountType {
   PUBLIC, MULTISIG, COLD, HOT
@@ -17,6 +18,7 @@ export class Account {
   derivationId: number;
 
   portfolio: { [id : string] : AccountToken[] };
+  contracts: { [id : string] : Contract[] };
 
   constructor(name: string, type: AccountType, address: string) {
     this.name = name;

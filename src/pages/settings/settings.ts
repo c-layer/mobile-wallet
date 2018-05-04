@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { Platform, AlertController } from 'ionic-angular';
+import { AlertController } from 'ionic-angular';
 import { NavController, NavParams } from 'ionic-angular';
 import { ProfileProvider } from '../../providers/profile';
 import { AccountProvider } from '../../providers/account';
@@ -12,6 +12,7 @@ import { NodeDetailsPage } from '../node-details/node-details';
 import { NetworksPage } from './networks/networks';
 import { NetworkProvider } from '../../providers/network';
 import { BootTimePage } from './performance/boottime/boottime';
+import { LoaderProvider } from '../../providers/loader';
 
 @Component({
   selector: 'page-settings',
@@ -24,11 +25,12 @@ export class SettingsPage {
   public profile: Profile = <Profile>{};
   public confirmations: number = 3;
 
-  constructor(private platform: Platform, private profileProvider: ProfileProvider,
+  constructor(private profileProvider: ProfileProvider,
     public accountProvider: AccountProvider,
     private alertCtrl: AlertController,
     private networkProvider: NetworkProvider,
-    public navCtrl: NavController, public navParams: NavParams) {
+    public navCtrl: NavController, public navParams: NavParams,
+    private loaderProvider: LoaderProvider) {
   }
 
   backupMnemonic() {
@@ -69,10 +71,15 @@ export class SettingsPage {
     });
   }
 
+  resetConfig() {
+    this.profileProvider.resetConfig().subscribe(() => {
+    });
+  }
+
   clearData() {
     this.profileProvider.clearProfile().subscribe(() => {
       this.navCtrl.parent.parent.setRoot(LandingPage);
-      this.platform.exitApp();
+      this.loaderProvider.restart();
     });
   }
 

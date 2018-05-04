@@ -16,12 +16,16 @@ page-portfolio {
         border-color: color($colors, dark) !important;
     }
 
+    .kyc-svg {
+        width: 25px;
+    }
+
     .token-svg {
         width: 40px;
     }
 
     ion-item-divider {
-        background-color: color($colors, secondary-dark) !important;
+        background-color: color($colors, secondary) !important;
         color: color($colors, secondary-light) !important;
     }
 }

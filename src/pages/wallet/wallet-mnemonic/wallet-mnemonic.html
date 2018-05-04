@@ -5,7 +5,7 @@
 <ion-content padding class="container">
   <div *ngIf="mode==walletMnemonicMode.RECOVER">
     <fieldset class="mnemonic">
-      <legend>Please provide below the 12 mnemonic words used for your backup</legend>
+      <legend>Please provide below the 12 mnemonics used for your backup</legend>
       <hr/>
       <!--ion-input name="passphrase" class="wordInput" placeholder="optional passphrase"></ion-input>
       <hr/-->
@@ -26,7 +26,7 @@
   </div>
   <div *ngIf="(mode == walletMnemonicMode.GENERATE) && !backingUp">
     <fieldset class="mnemonic">
-      <legend>The 12 mnemonic words below are to be used for your backup:</legend>
+      <legend>These 12 words below are mnemonics. Please make sure to save them offline as you will need them to recover your wallet!</legend>
       <hr/>
       <div class="mnemonic-box">
         <ion-badge class="word" *ngFor="let word of mnemonic">{{ word }}</ion-badge>
@@ -45,13 +45,10 @@
           <ion-badge class="word" *ngFor="let word of mnemonic">{{ word }}</ion-badge>
         </div>
         <br/>
-        <p class="hint">These words are the only way that you will have to recovery your money</p>
-        <p class="hint">You do want to memorize these words.</p>
-        <p class="hint">A good practice is to start with writing these words on a paper and keep it in a safe place !</p>
-        <br/>
-        <p class="hint">You will be asked now to give back the words in the same order. Click 'start'  when you are ready.</p>
-
-        <button ion-button full (click)="memorize()" class="actions">start</button>
+        <p class="hint">These words are the only way to recover your money.</p>
+        <p class="hint"><b>We advise you to memorize these words.</b></p>
+        <p class="hint">The next step will let you practice to remember these words. Memorize them now and click start when you are ready 1</p>
+        <button ion-button full (click)="memorize()" class="actions">start practice</button>
         <button ion-button full (click)="proceed()" class="actions" 
         *ngIf="mode==walletMnemonicMode.GENERATE"
         outline>backup later !</button>

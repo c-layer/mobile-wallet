@@ -45,6 +45,10 @@ export class FormatProvider {
             + ':' + digits2(date.getSeconds());
     }
 
+    formatHexadecimal(value: string) {
+        return '0x' + parseInt(value).toString(16);
+    }
+
     formatAddress(address) {
         let name = address;
 

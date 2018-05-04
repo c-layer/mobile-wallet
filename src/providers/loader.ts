@@ -51,11 +51,17 @@ export class LoaderProvider {
         this.setStatus('web3Loaded');
     }
 
+    public restart() {
+        this.loadingSteps = [];
+        this.start();
+    }
+
     public start() {
         this.setStatus('appStarting');
 
         let profileLoadingObs = this.profileProvider.loadProfile().catch(error => {
             this.setStatus('profileError', false, false, error);
+            console.log('profileError: unable to load profile');
             return Observable.of(undefined);
         }).flatMap((profile: Profile) => {
             this.setStatus('profileLoaded');
