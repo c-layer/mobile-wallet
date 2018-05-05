@@ -28,7 +28,11 @@
           Scan
         </button-->
     </ion-item>
-  </ion-list>
+    <ion-item>
+        <ion-label floating>Data</ion-label>
+        <ion-input name="selectedData" [(ngModel)]="selectedData" (ionChange)="update()"></ion-input>
+      </ion-item>
+    </ion-list>
   <ion-list class="transfer">
     <!--ion-item>
         <ion-label floating>Gas Price Selector</ion-label>

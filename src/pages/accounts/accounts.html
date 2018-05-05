@@ -9,7 +9,7 @@
       <button ion-button (click)="createAccount()" class="action">Generate new</button>
     </ion-item>
     <ion-item-divider>Deterministic Wallet</ion-item-divider>
-    <button ion-item *ngFor="let account of getDeterministicWalletAccounts()" 
+    <button ion-item no-lines *ngFor="let account of getDeterministicWalletAccounts()" 
       (click)="selectAccount($event, account)" class="account"
       [ngClass]="{ 'account-active': (account.active) }">
       <ion-icon name="person" item-start></ion-icon>
@@ -20,7 +20,7 @@
       </button>
     </button>
     <ion-item-divider color="secondary-dark" *ngIf="hasExternalAccounts()">External Account</ion-item-divider>
-    <button ion-item *ngFor="let account of getExternalAccounts()"
+    <button ion-item no-lines *ngFor="let account of getExternalAccounts()"
       (click)="selectAccount($event, account)" class="account"
       [ngClass]="{ 'account-active': (account.active) }">
         <ion-icon name="person" item-start></ion-icon>

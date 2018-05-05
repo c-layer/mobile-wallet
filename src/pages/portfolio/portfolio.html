@@ -17,13 +17,13 @@
       <h2>
         <b>{{ activeAccountBalance(token) }}</b>
       </h2>
-      <button item-end ion-button icon-end solid *ngIf="activeAccountCanSend(token)" (click)="startTransfer(token, $event)">
+      <button item-end ion-button icon-end solid [disabled]="!activeAccountCanSend(token)" (click)="startTransfer(token, $event)">
         Send
         <ion-icon name="card"></ion-icon>
       </button>
     </button>
 
-    <ion-item-divider *ngIf="getTokens('RSK') != false">Rsk Tokens</ion-item-divider>
+    <ion-item-divider *ngIf="getTokens('RSK') != false">Rootstock Tokens</ion-item-divider>
     <button ion-item no-lines *ngFor="let token of getTokens('RSK')" (click)="goToDetailsPage(token)"
       class="token">
       <ion-avatar item-start>
@@ -36,13 +36,13 @@
         <b>{{ activeAccountBalance(token) }}</b>
       </h2>
       <img item-end icon-end class="kyc-svg" src="assets/icon/no-kyc-icon.svg" *ngIf="!activeAccountIsKyc(token)"/>
-      <button item-end ion-button icon-end solid *ngIf="activeAccountCanSend(token)" (click)="startTransfer(token, $event)">
+      <button item-end ion-button icon-end solid [disabled]="!activeAccountCanSend(token)" (click)="startTransfer(token, $event)">
         Send
         <ion-icon name="card"></ion-icon>
       </button>
     </button>
 
-    <ion-item-divider *ngIf="getTokens('ETH') != false">Eth Tokens</ion-item-divider>
+    <ion-item-divider *ngIf="getTokens('ETH') != false || getContracts('ETH') != false">Ethereum</ion-item-divider>
     <button ion-item no-lines *ngFor="let token of getTokens('ETH')" (click)="goToDetailsPage(token)"
       class="token">
       <ion-avatar item-start>
@@ -55,23 +55,21 @@
         <b>{{ activeAccountBalance(token) }}</b>
       </h2>
       <img item-end icon-end class="kyc-svg" src="assets/icon/no-kyc-icon.svg" *ngIf="!activeAccountIsKyc(token)"/>
-      <button item-end ion-button icon-end solid *ngIf="activeAccountCanSend(token)" (click)="startTransfer(token, $event)">
+      <button item-end ion-button icon-end solid [disabled]="!activeAccountCanSend(token)" (click)="startTransfer(token, $event)">
         Send
         <ion-icon name="card"></ion-icon>
       </button>
     </button>
-
-    <ion-item-divider *ngIf="getContracts('ETH') != false">Eth Contracts</ion-item-divider>
     <button ion-item no-lines *ngFor="let contract of getContracts('ETH')"
         (click)="goToContractDetailsPage(contract)" class="token">
       <ion-avatar item-start>
         <img *ngIf=" contract.image" type="image/svg+xml" src="{{ contract.image }}" class="token-svg"/>
-        <img *ngIf="!contract.image" class="token-svg" src="assets/imgs/currencies/OTHER.png"/>
+        <img *ngIf="!contract.image" class="test-svg" src="assets/icon/contract-icon.svg"/>
       </ion-avatar>
       <h2>
         <b>{{ contract.name }}</b>
       </h2>
-      <img item-end icon-end class="kyc-svg" src="assets/icon/no-kyc-icon.svg" *ngIf="canVote(contract)"/>
+      <img item-end icon-end class="kyc-svg" src="assets/icon/vote-icon.svg" *ngIf="canVote(contract)"/>
     </button>
   </ion-list>
   <ion-card>

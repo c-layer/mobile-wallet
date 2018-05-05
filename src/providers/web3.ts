@@ -53,7 +53,8 @@ export class Web3Provider {
           gas: 30000,
           gasPrice: data[1],
           to: toAddress,
-          chainId: data[2]
+          chainId: data[2],
+          data: contractData
         };
         if (value) {
           txParams['value'] = value;

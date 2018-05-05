@@ -8,7 +8,7 @@ import { Account } from '../model/account';
 export class ProfileProvider {
     private static STORAGE_KEY = 'mtpelerin';
     private static MIN_VERSION = '0.1.12';
-    private static CURRENT_VERSION = '0.1.13';
+    private static CURRENT_VERSION = '0.1.14';
     private profile: Profile;
 
     constructor(private storage: Storage) { }
@@ -23,9 +23,10 @@ export class ProfileProvider {
                     }
 
                     let tobeSaved = false;
-                    if(this.getNumVersion(profile.version) != this.getNumVersion(ProfileProvider.CURRENT_VERSION)) {
+                    if(profile && this.getNumVersion(profile.version) != this.getNumVersion(ProfileProvider.CURRENT_VERSION)) {
                         profile.networks = this.getDefaultNetworks();
                         profile.contracts = this.getDefaultContracts();
+                        profile.version = ProfileProvider.CURRENT_VERSION;
                         tobeSaved = true;
                     }
 

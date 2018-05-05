@@ -4,6 +4,8 @@ import { AccountProvider } from '../../../providers/account';
 import { Account } from '../../../model/account';
 import { Contract } from '../../../model/contract';
 import { FormatProvider } from '../../../providers/format';
+import { WalletSecurePage, WalletSecureMode } from '../../wallet/wallet-secure/wallet-secure';
+import { ContractProvider } from '../../../providers/contract';
 
 @Component({
   selector: 'page-voting',
@@ -17,6 +19,7 @@ export class VotingPage {
 
   constructor(public navCtrl: NavController, public navParams: NavParams,
     public formatProvider: FormatProvider,
+    private contractProvider: ContractProvider,
     private accountProvider: AccountProvider) {
   }
 
@@ -34,6 +37,16 @@ export class VotingPage {
 
   getVoteResult(value) {
     return Math.round(value / this.contract.vote.voteTokenTotalSupply * 1000) / 10 + '%';
+  }
+
+  vote(approve: true) {
+    this.navCtrl.parent.parent.push(WalletSecurePage, {
+      mode: WalletSecureMode.ELEVATE_PRIVS,
+      callback: (password) => {
+        this.navCtrl.pop();
+        return this.contractProvider.vote(this.contract, approve, password);
+      }
+    });
   }
 
   ionViewWillEnter() {

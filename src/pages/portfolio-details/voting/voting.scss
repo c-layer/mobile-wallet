@@ -16,12 +16,16 @@ page-voting {
         border-color: color($colors, secondary) !important;
     }
 
-    .balance-item {
-        padding-bottom: 5px;
-    }
-
     .balance-title {
         margin-bottom: 0px;
+    }
+
+    .leftlabel-reduced > ion-item > div > div :first-child {
+        flex: 0.46;
+    }
+
+    .leftlabel-reduced > ion-item > div > div :nth-child(2) {
+        text-align: right;
     }
 
     .balance {
@@ -33,12 +37,5 @@ page-voting {
 
     .result {
         font: 30px bold;
-    }
-
-    .approvals {
-        color: color($colors, valid) !important;
-    }
-    .rejections {
-        color: color($colors, danger) !important;
     }
 }

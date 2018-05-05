@@ -30,6 +30,8 @@ export class ScanPage {
    * @param address 
    */
   detectAddressType(address: string) {
+    address = address.replace('ethereum:', ''); // Metamask QRCode
+    
     if(address.length == Account.PRIVATE_KEY_LENGTH) {
       this.typeFound = 'Private Key';
       this.navCtrl.push(WalletSecurePage, { 
@@ -40,7 +42,9 @@ export class ScanPage {
             this.navCtrl.popAll();
             return data;
           });
-      }})
+      }}).catch((error) => {
+        console.log(error);
+      })
     }
 
     if(address.length == Account.PUBLIC_KEY_LENGTH) {

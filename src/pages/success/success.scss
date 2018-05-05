@@ -15,7 +15,7 @@ page-success {
         vertical-align: middle;
         text-align: center;
         color: color($colors, light);
-        font-size: 26px;
+        font-size: 24px;
     }
 
     .message-container {
@@ -30,8 +30,8 @@ page-success {
     }
 
     .svg {
-        width: 70%;
-        max-height: 70%;
+        width: 60%;
+        max-height: 60%;
         fill: color($colors, valid);
         margin: auto;
         display: block;

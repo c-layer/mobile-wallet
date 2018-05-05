@@ -1,27 +1,23 @@
 <ion-header>
   <header [colorAttr]="'secondary-dark'">
     <div *ngIf="contract && contract.vote">
-      Shares for {{ contract.vote.voteTokenName }}
+      {{ contract.vote.voteTokenSymbol }} shares
     </div>
   </header>
 </ion-header>
 
 <ion-content padding class="container">
   <ion-list *ngIf="contract && contract.share && contract.vote">
-    <ion-item>
+    <ion-item no-lines>
       <ion-label item-begin>
         <b>Controlled</b>
       </ion-label>
-      <ion-label item-end>{{ contract.vote.voteTokenOwned }} / {{ contract.vote.voteTokenTotalSupply
+      <ion-label item-end text-right>{{ contract.vote.voteTokenOwned }} / {{ contract.vote.voteTokenTotalSupply
         }}
       </ion-label>
     </ion-item>
-  </ion-list>
-  <ion-list *ngIf="contract && contract.share && contract.vote && contract.vote.proposalId == 0">
-    <ion-item text-center>No votes has been created yet</ion-item>
-  </ion-list>
-  <ion-list *ngIf="contract && contract.share && contract.vote && contract.vote.proposalId != 0">
-    <ion-item no-lines>
+    <ion-item no-lines text-center *ngIf="contract.vote.proposalId == 0">No votes has been created yet</ion-item>
+    <ion-item no-lines *ngIf="contract.vote.proposalId != 0">
       <ion-label class="balance-title" *ngIf="contract.vote.proposalId == 0">
         <b>Dividend available</b>
       </ion-label>
@@ -29,14 +25,13 @@
         <b>Dividend to be distributed</b>
       </ion-label>
     </ion-item>
-    <ion-item no-lines class="balance-item">
+    <ion-item no-lines *ngIf="contract.vote.proposalId != 0">
       <ion-label text-right class="balance">{{ formatProvider.formatAmount(contract.share.dividendAmount) }} {{contract.share.dividendSymbol}}</ion-label>
     </ion-item>
-  </ion-list>
-  <ion-list *ngIf="contract && contract.share && contract.vote && contract.vote.proposalId != 0">
+    <div *ngIf="contract && contract.share && contract.vote && contract.vote.proposalId != 0" class="leftlabel-reduced">
     <ion-item no-lines>
       <ion-label item-begin>
-        <h1>Vote n&deg;{{ contract.vote.proposalId }}</h1>
+        <b>Vote n&deg;{{ contract.vote.proposalId }}</b>
       </ion-label>
     </ion-item>
     <ion-item>
@@ -66,23 +61,26 @@
       <ion-label item-end *ngIf="isClosedAtDefined()">{{ formatProvider.formatDate(contract.vote.closedAt) }}</ion-label>
       <ion-label item-end *ngIf="!isClosedAtDefined()">Not defined</ion-label>
     </ion-item>
-    <ion-item text-center class="result">
+  </div>
+</ion-list>
+  <ion-list *ngIf="contract && contract.share && contract.vote && contract.vote.proposalId != 0">
+    <ion-item no-lines text-center class="result">
       <span class="approvals">{{getVoteResult(contract.vote.approvals)}}</span> vs
       <span class="rejections">{{getVoteResult(contract.vote.rejections)}}</span>
     </ion-item>
   </ion-list>
   <ion-list *ngIf="contract && contract.share && contract.vote && contract.vote.proposalId != 0 && !isClosed() && !contract.vote.hasVoted">
-    <button item-begin ion-button icon-end solid block color="valid">
+    <button item-begin ion-button icon-end solid block (click)="vote(true)">
       Yes
     </button>
-    <button item-begin ion-button solid block color="danger">
+    <button item-begin ion-button solid block (click)="vote(false)">
       No
     </button>
   </ion-list>
   <ion-list *ngIf="contract && contract.share && contract.vote && contract.vote.proposalId != 0 && !isClosed() && contract.vote.hasVoted">
-    <ion-item text-center>You have already voted !</ion-item>
+    <ion-item no-lines text-center>You have already voted !</ion-item>
   </ion-list>
   <ion-list *ngIf="contract && contract.share && contract.vote && contract.vote.proposalId != 0 && isClosed()">
-    <ion-item text-center>No votes has been created yet</ion-item>
+    <ion-item no-lines text-center>No votes has been created yet</ion-item>
   </ion-list>
 </ion-content>

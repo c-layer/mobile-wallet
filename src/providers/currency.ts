@@ -243,7 +243,12 @@ export class CurrencyProvider {
   public allCurrenciesObs(): Observable<Array<Currency>> {
 
     let directoryPromises = [];
-    let tokens = [];
+    let tokens = [
+      this.getCoreCurrency(this.web3Provider.getEthProvider(),
+        'ETH', 'Ethereum', 'ETH', 'assets/imgs/currencies/ETHER.svg'),
+        this.getCoreCurrency(this.web3Provider.getRskProvider(),
+        'RSK', 'SmartBTC', 'SBTC', 'assets/imgs/currencies/RSK.png')
+    ];
     let profile = this.profileProvider.getProfile();
 
     let activeNetworks = this.networkProvider.getActiveNetworks();
@@ -254,9 +259,6 @@ export class CurrencyProvider {
         directoryPromises = directoryPromises.concat(contracts['ETH'].map(directory =>
           this.getRegistry('ETH', this.web3Provider.getEthProvider(), directory)));
       }
-
-      tokens = tokens.concat(this.getCoreCurrency(this.web3Provider.getEthProvider(),
-        'ETH', 'Ethereum', 'ETH', 'assets/imgs/currencies/ETHER.svg'));
     }
 
     if (this.web3Provider.getRskProvider()) {
@@ -269,8 +271,7 @@ export class CurrencyProvider {
         }
 
       tokens = tokens.concat(
-        this.getCoreCurrency(this.web3Provider.getRskProvider(),
-          'RSK', 'SmartBTC', 'SBTC', 'assets/imgs/currencies/RSK.png'));
+        );
     }
 
     let currenciesPromises = Promise.all(directoryPromises).then(data => {
