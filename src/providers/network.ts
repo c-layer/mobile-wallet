@@ -21,6 +21,7 @@ export class NetworkProvider {
     }
 
     public updateNetworks(networkName: string) {
+        console.log('network updated: ' + networkName);
         if (this.getActiveNetworks().name != networkName) {
             let profile = this.profileProvider.getProfile();
             profile.networks.forEach(network => {

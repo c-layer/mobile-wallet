@@ -27,6 +27,7 @@ export class NodeDetailsPage {
 
     this.networkProvider.getNodeInfo(nodeName).then(result => {
       if(result) {
+        console.log(result);
         this.node.blockNumber = result.block.number;
         this.node.peerCount = result.peerCount;
         this.node.gasPrice = result.gasPrice;

@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { NavController } from 'ionic-angular';
 import { ProfileProvider } from '../../../providers/profile';
 import { NetworkProvider } from '../../../providers/network';
+import { LoaderProvider } from '../../../providers/loader';
 
 @Component({
   selector: 'page-networks',
@@ -14,11 +15,13 @@ export class NetworksPage {
   constructor(
     private networkProvider: NetworkProvider,
     private navCtrl: NavController,
+    private loaderProvider: LoaderProvider,
     private profileProvider: ProfileProvider) {
   }
 
   updateNetworks() {
     this.networkProvider.updateNetworks(this.activeNetworkName);
+    this.loaderProvider.startWeb3().catch(error => console.log);
   }
 
   public getNetworks() {
