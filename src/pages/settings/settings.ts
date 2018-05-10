@@ -20,6 +20,7 @@ import { LoaderProvider } from '../../providers/loader';
 })
 export class SettingsPage {
   public activeNetwork = {};
+  public configReset: boolean = false;
   public hasCache: boolean = false;
   public cacheSize: string = '';
   public profile: Profile = <Profile>{};
@@ -73,6 +74,7 @@ export class SettingsPage {
 
   resetConfig() {
     this.profileProvider.resetConfig().subscribe(() => {
+      this.configReset = true;
     });
   }
 
@@ -109,6 +111,7 @@ export class SettingsPage {
       this.profileProvider.getProfile() : this.profile;
 
     this.hasCache = false;
+    this.configReset = false;
     let cacheSize = 0;
     if (this.profile.accounts) {
       this.profile.accounts.forEach(account => {

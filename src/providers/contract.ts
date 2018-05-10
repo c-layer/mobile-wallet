@@ -151,9 +151,17 @@ export class ContractProvider {
                                             let voteTokenOwned = format(details[2], details[17]);
                                             let approvals = format(details[14], details[17]);
                                             let rejections = format(details[15], details[17]);
+                                            let name = details[3];
+
+                                            let imageColor = 'mtpelerin';
+                                            if(name != 'Mt Pelerin') {
+                                                imageColor = ['green', 'purple', 'salmon'][i%3];
+                                            }
+
                                             contract = <Contract>{
                                                 name: details[3] + ' shares',
                                                 address: address,
+                                                image: 'assets/icon/contracts/default-'+imageColor+'.svg',
                                                 share: {
                                                     dividendToken: details[5],
                                                     dividendAmount: dividendAmount,

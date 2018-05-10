@@ -47,7 +47,7 @@ export class TransferPage {
       if (currency) {
         currency.getGasPrice().subscribe((data) => {
           if (data) {
-            this.selectedGasPrice = data;
+            this.selectedGasPrice = 10 * data;
           }
         });
       }

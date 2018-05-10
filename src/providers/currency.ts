@@ -1,3 +1,5 @@
+declare function require(moduleName: string): any;
+const Big = require("big.js");
 
 import { Injectable } from '@angular/core';
 import { Web3Provider } from './web3';
@@ -60,66 +62,32 @@ export class CurrencyProvider {
       if (currencies.length == 0) return Observable.of([]);
       return Observable.forkJoin(currencies.filter(currency => !!currency).map(currency => {
         if (currency.contract == null) {
-          return currency.balanceOf(account).map(balance => {
-            let transactions = [];
-
-            return <AccountToken>{
+          return currency.balanceOf(account).map(balance => <AccountToken>{
               currency: currency.symbol,
               image: currency.image,
               network: currency.network,
               name: currency.name,
               balance: balance.toString(),
               untilBlock: null,
-              transactions: transactions,
+              transactions: [],
               isCore: currency.isCore,
               isKyc: false
-            }
           });
         } else {
           let balanceObs = currency.balanceOf(account);
           let isKycObs = currency.isKyc(account);
           
-          return Observable.zip(balanceObs, isKycObs, (balance, isKyc) => {
-            let transactions = [];
-
-            if (currency.network == 'RSK' && currency.symbol == 'GBP') {
-            }
-
-            if (currency.network == 'ETH') {
-              currency.contract.events.Transfer({
-                fromBlock: 0,
-                //   toBlock: null,
-                topics: [null, this.web3Provider.encodeAddress(account.address), null]
-              }).subscribe((error, data) => {
-                if (error) {
-                  console.error(error);
-                } else if (data) {
-                  transactions.push(data);
-                }
-              });
-              currency.contract.events.Transfer({
-                fromBlock: 0,
-                //   toBlock: null,
-                topics: [null, null, this.web3Provider.encodeAddress(account.address)]
-              }).subscribe((error, data) => {
-                if (error) {
-                  console.error(error);
-                } else if (data) {
-                  transactions.push(data);
-                }
-              });
-            }
-            return <AccountToken>{
+          return Observable.zip(balanceObs, isKycObs).map((value) => 
+          <AccountToken>{
               currency: currency.symbol,
               image: currency.image,
               name: currency.name,
               network: currency.network,
-              balance: balance + '',
+              balance: value[0] + '',
               untilBlock: null,
-              transactions: transactions,
+              transactions: [],
               isCore: currency.isCore,
-              isKyc: isKyc
-            };
+              isKyc: value[1]
           });
         }
       }));
@@ -135,7 +103,7 @@ export class CurrencyProvider {
       balanceOf: (account: Account) => Observable.fromPromise(Promise.resolve(account)
         .then(account => web3.eth.getBalance(account.address)
           .then(balance =>
-            web3.utils.fromWei(balance, 'ether')))),
+            web3.utils.fromWei(balance, 'ether'))).catch(error => Observable.throw(error))),
       isKyc: (account: Account) => Observable.of(false),
       history: (account: Account, start = 0) =>
         this.explorerProvider.findCoreTransactions(web3, network, account, start),
@@ -149,12 +117,47 @@ export class CurrencyProvider {
       },
       estimateTransfer: (sender: Account, beneficiaryAddress: string, amount: number) => {
         let value = web3.utils.toWei(amount, 'ether');
-        return Observable.fromPromise(web3.eth.estimateGas({ from: sender.address, to: beneficiaryAddress, value }));
+        return Observable.fromPromise(web3.eth.estimateGas({ from: sender.address, to: beneficiaryAddress, value })
+            .catch(error => Observable.throw(error)));
       },
       getGasPrice: () => {
-        return Observable.fromPromise(web3.eth.getGasPrice());
+        return Observable.fromPromise(web3.eth.getGasPrice().catch(error => Observable.throw(error)));
       }
     });
+  }
+
+  public loadAccountHistoryObs(currency,account) {
+    if (currency.network == 'ETH') {
+      console.log(currency.symbol + ' lookup of events !');
+      let t= currency.contract.events.Transfer({
+        fromBlock: 0,
+        //   toBlock: null,
+        topics: [null, this.web3Provider.encodeAddress(account.address), null]
+      });
+      console.log(t);
+      
+      t.subscribe((error, data) => {
+        if (error) {
+          console.error(error);
+        } else if (data) {
+          console.log(currency.symbol + ' [FROM] found ' + data);
+          return data;
+        }
+      });
+      currency.contract.events.Transfer({
+        fromBlock: 0,
+        //   toBlock: null,
+        topics: [null, null, this.web3Provider.encodeAddress(account.address)]
+      }).subscribe((error, data) => {
+        if (error) {
+          console.error(error);
+        } else if (data) {
+          console.log(currency.symbol + ' [TO] found ' + JSON.stringify(data));
+          return data;
+        }
+      });
+    }
+    return null;
   }
 
   private getRegistry(network, web3, directoryConfig): Promise<Currency>[] {
@@ -175,6 +178,14 @@ export class CurrencyProvider {
               methods.totalSupply().call(),
               methods.decimals().call()
             ];
+
+            let image = function(symbol, i) {
+              let result = symbol;
+              if(['MPL', 'EUR', 'USD', 'GBP', 'CHF'].indexOf(symbol) == -1) {
+                result = ['green', 'purple', 'salmon'][i%3];
+              }
+              return result;
+            }
             
             return Promise.all(promises).then(details => <Currency>{
               name: details[0],
@@ -185,12 +196,12 @@ export class CurrencyProvider {
               supply: details[2],
               symbol: details[1],
               isCore: false,
-              image: 'assets/imgs/currencies/MTPELERIN.svg',
+              image: 'assets/icon/currencies/'+image(details[1], i)+'.svg',
               balanceOf: function (account: Account) {
                 return Observable.fromPromise(Promise.resolve(account)
                   .then(account => this.contract.methods.balanceOf(account.address).call()
-                    .then(balance => balance / 10 ** this.decimal)
-                  ));
+                    .then(balance => Big(balance).div(Big(10**this.decimal)))
+                  )).catch((error) => Observable.throw(error));
               },
               isKyc: function( account: Account ) {
                 let contractType = ContractType.getContractType(directoryConfig.types[i]);
@@ -198,7 +209,7 @@ export class CurrencyProvider {
                   return Observable.fromPromise(Promise.resolve(account)
                     .then(account => this.contract.methods.isKYCValid(account.address).call().then(isKyc => {
                       return isKyc;
-                    })));
+                    }).catch(error => Observable.throw(error))));
                 }
                 return Observable.of(true);
               },
@@ -217,10 +228,10 @@ export class CurrencyProvider {
                 let cents = amount * (10 ** details[3]);
                 return Observable.fromPromise(methods.transfer(beneficiaryAddress, cents).estimateGas(
                   { from: sender.address, to: beneficiaryAddress, value: 0 }
-                ));
+                ).catch(error => Observable.throw(error)));
               },
               getGasPrice: () => {
-                return Observable.fromPromise(web3.eth.getGasPrice());
+                return Observable.fromPromise(web3.eth.getGasPrice().catch((error) => Observable.throw(error)));
               }
             });
           } else {
@@ -245,9 +256,9 @@ export class CurrencyProvider {
     let directoryPromises = [];
     let tokens = [
       this.getCoreCurrency(this.web3Provider.getEthProvider(),
-        'ETH', 'Ethereum', 'ETH', 'assets/imgs/currencies/ETHER.svg'),
+        'ETH', 'Ethereum', 'ETH', 'assets/icon/currencies/ETH.svg'),
         this.getCoreCurrency(this.web3Provider.getRskProvider(),
-        'RSK', 'SmartBTC', 'SBTC', 'assets/imgs/currencies/RSK.png')
+        'RSK', 'SmartBTC', 'SBTC', 'assets/icon/currencies/RSK.png')
     ];
     let profile = this.profileProvider.getProfile();
 
@@ -285,7 +296,7 @@ export class CurrencyProvider {
 
     currenciesPromises.then(currencies => {
       this.currencies = currencies;
-    });
+    }).catch(error => Observable.throw(error));
 
     return Observable.fromPromise(currenciesPromises);
   }

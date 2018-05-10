@@ -1,4 +1,11 @@
-page-tabs {      
+page-tabs {
+    a.tab-button[aria-selected=true] {
+        background-color: color($colors, primary) !important;  
+    }
+
+    a.tab-button[aria-selected=false] {
+        background-color: color($colors, secondary-dark) !important;  
+    }
 
     .ion-ios-wallet:before, 
     .ion-ios-wallet-outline:before,

@@ -16,10 +16,6 @@ page-voting {
         border-color: color($colors, secondary) !important;
     }
 
-    .balance-title {
-        margin-bottom: 0px;
-    }
-
     .leftlabel-reduced > ion-item > div > div :first-child {
         flex: 0.46;
     }
@@ -28,11 +24,28 @@ page-voting {
         text-align: right;
     }
 
+    .shares {
+        margin: 0px !important;
+    }
+
     .balance {
         font: 30px bold;
         margin-top: 0px;
+        margin-bottom: 0px;
         position: absolute;
         right: 0px;
+    }
+
+    .vote-id { 
+        min-height: 0px;
+    }
+
+    .yes-no {
+        height: 50px;
+    }
+
+    .vote-url {
+        flex: 1 !important;
     }
 
     .result {

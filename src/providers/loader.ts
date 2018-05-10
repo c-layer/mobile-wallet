@@ -47,8 +47,9 @@ export class LoaderProvider {
 
     public startWeb3() {
         this.notificationsProvider.start();
-        this.web3Provider.start();
-        this.setStatus('web3Loaded');
+        return this.web3Provider.start().then(data =>
+            this.setStatus('web3Loaded')
+        );
     }
 
     public restart() {

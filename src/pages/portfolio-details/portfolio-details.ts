@@ -8,6 +8,8 @@ import { CurrencyProvider } from '../../providers/currency';
 import { Currency } from '../../model/currency';
 import { Account } from '../../model/account';
 import { AccountToken } from '../../model/account-token';
+import { ProfileProvider } from '../../providers/profile';
+import { ExplorerProvider } from '../../providers/explorer';
 
 @Component({
   selector: 'page-portfolio-details',
@@ -27,7 +29,12 @@ export class PortfolioDetailsPage {
   constructor(private accountProvider: AccountProvider,
     private currencyProvider: CurrencyProvider,
     public formatProvider: FormatProvider,
+    private profileProvider: ProfileProvider,
     public navCtrl: NavController, public navParams: NavParams) {
+  }
+
+  getMaxTrie() {
+    return ExplorerProvider.MAX_TRIE;
   }
 
   activeAccountCanSend(token) {
@@ -52,7 +59,7 @@ export class PortfolioDetailsPage {
       }
       return <Transaction>{
         hash: transaction.transactionHash,
-        timestamp: null,
+        time: null,
         blockNumber: transaction.blockNumber,
         amount: amount, from: from, to: to
       }
@@ -82,10 +89,9 @@ export class PortfolioDetailsPage {
       } else {
         amount = amount / (10 ** this.currency.decimal);
       }
-
       return <Transaction>{
         hash: transaction.hash,
-        timestamp: transaction.timestamp,
+        time: this.formatProvider.formatTimeAgo(transaction.timestamp),
         blockNumber: transaction.blockNumber,
         amount: amount, from: from, to: to
       }
@@ -95,7 +101,6 @@ export class PortfolioDetailsPage {
       return 0;
     }).reverse();
 
-    console.log(sortedTxs);
     return sortedTxs;
   }
 
@@ -135,16 +140,27 @@ export class PortfolioDetailsPage {
         }
 
         if (result && result.block && result.block != 0) {
-          this.progress = Math.floor((result.completion / result.block) * 10000) / 100;
+          if(result.block == result.start) {
+            this.progress = 100;
+          } else {
+            this.progress = Math.floor((result.completion / (result.block - result.start)) * 10000) / 100;
+          }
         }
 
-        if ((result.block >= 0) && result.block == result.completion) {
-          this.token.transactions = this.token.transactions.concat(result.transactions);
-          this.token.untilBlock += result.block;
+        if ((result.block >= 0) && this.progress == 100) {
+          let transactions = [];
+          this.token.transactions.forEach(tx => {
+            if(tx.blockNumber > (result.start - ExplorerProvider.MAX_TRIE)) {
+              transactions.push(tx);
+            }
+          });
+          this.token.transactions = transactions.concat(result.transactions);
+          this.token.untilBlock = result.start + result.completion;
           this.history = this.formatCoreTransactions(result.network, this.token.transactions);
           this.historyReady = true;
 
           this.accountProvider.setActiveAccountPortfolio(portfolio);
+          this.profileProvider.saveProfile();
         }
       });
     } else {

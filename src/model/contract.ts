@@ -9,6 +9,7 @@ const DemoShare = require('../assets/contracts/DemoShare.json');
 export class Contract {
   name: string;
   address: string;
+  image: string;
   share: {
     dividendAmount: number;
     dividendSymbol: number;

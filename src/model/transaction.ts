@@ -3,7 +3,7 @@ import { Account } from './account';
 export class Transaction {
   hash: string
   blockNumber: number;
-  timestamp: number;
+  time: string;
   amount: number;
   from: string;
   accountFrom: Account;

@@ -107,25 +107,33 @@ export class AccountProvider {
     }
 
     private addPrivateAccount(password: string, privateKey?: string, name?: string): Observable<Account> {
-        let internal = null;
         let wallet = this.web3Provider.getAccounts().wallet.decrypt(this.encryptedWallet, password);
         console.log('wallet decrypted');
+        let mnemonic = this.readMnemonic(password);
+
+        let account = this.addPrivateAccountUnencrypted(wallet, name, mnemonic, privateKey);
+
+        this.encryptedWallet = wallet.encrypt(password);
+        console.log('wallet reencrypted');
+        return this.profileProvider.setAccounts(
+            this.accounts, this.encryptedWallet, this.derivationUsed).map(() => account);
+    }
+
+    private addPrivateAccountUnencrypted(wallet, name, mnemonic: any, privateKey?) {
         let derivationId = null;
+        let internal = null;
 
         if (privateKey) {
             console.log('Importing external key');
             internal = this.web3Provider.getAccounts().privateKeyToAccount(privateKey);
         } else {
             console.log('Generate privateKey from deterministic wallet');
-            const privateKey = this.generatePrivateKeyFromMenomnic(null, password, this.derivationUsed);
+            const privateKey = this.generatePrivateKeyFromMenomnic(mnemonic, null, this.derivationUsed);
             derivationId = this.derivationUsed;
             this.derivationUsed++;
             internal = this.web3Provider.getAccounts().privateKeyToAccount(privateKey);
         }
-        console.log(internal);
         wallet.add(internal);
-        this.encryptedWallet = wallet.encrypt(password);
-        console.log('wallet reencrypted');
 
         let account = Account.hotAccount(name, internal.address);
         account.derivationId = derivationId;
@@ -134,9 +142,7 @@ export class AccountProvider {
         this.accounts.push(account);
 
         this.setInMemoryActive(account);
-
-        return this.profileProvider.setAccounts(
-            this.accounts, this.encryptedWallet, this.derivationUsed).map(() => account);
+        return account;
     }
 
     public getPrivateKey(account: Account, password: string): Observable<string> {
@@ -228,7 +234,7 @@ export class AccountProvider {
             }).length > 0;
     };
 
-    public createWallet(mnemonic: string, passphrase: string, password: string): Observable<Profile> {
+    public createWallet(mnemonic: string, passphrase: string, password: string): Observable<Account> {
         if (this.profileProvider.getProfile().encryptedWallet.length > 0) {
             console.log(this.profileProvider.getProfile());
             throw 'An encrypted wallet already exists !';
@@ -236,18 +242,20 @@ export class AccountProvider {
 
         let wallet = this.web3Provider.getAccounts().wallet.create();
         this.accounts = [];
-        this.encryptedWallet = wallet.encrypt(password);
         this.derivationUsed = 0;
-        this.storeMnemonic(mnemonic, password);
+
+        // create Main Account
+       let internal = this.addPrivateAccountUnencrypted(wallet, 'Main Account', mnemonic);
+       this.encryptedWallet = wallet.encrypt(password);
+       this.storeMnemonic(mnemonic, password);
 
         return this.profileProvider.setAccounts(
             this.accounts,
-            this.encryptedWallet, this.derivationUsed, this.encryptedMnemonic);
+            this.encryptedWallet, this.derivationUsed, this.encryptedMnemonic).map(() => internal);
     }
 
-    private generatePrivateKeyFromMenomnic(passphrase, password, derivationUsed): string {
+    private generatePrivateKeyFromMenomnic(mnemonic, passphrase, derivationUsed): string {
         console.log('Generating a private key...');
-        let mnemonic = this.readMnemonic(password);
         const seed = Bip39.mnemonicToSeed(mnemonic, passphrase);
         let bip32RootKey = bitcoinjs.HDNode.fromSeedHex(seed, bitcoinjs.networks.bitcoin);
         const derived = bip32RootKey.derivePath("m/44'/60'/0'/0/" + derivationUsed);
@@ -267,6 +275,10 @@ export class AccountProvider {
 
     public readMnemonic(password: string): string {
         let mnemonicAddress = this.web3Provider.getAccounts().decrypt(this.encryptedMnemonic, password);
+        return this.readMnemonicFromAddress(mnemonicAddress);
+    }
+
+    private readMnemonicFromAddress(mnemonicAddress): string {
         let ids = mnemonicAddress.privateKey.match(/.{1,3}/g);
         let words = [];
         ids.reverse().forEach(id => {
@@ -315,19 +327,23 @@ export class AccountProvider {
         return contracts;
     }
 
-    public setActiveAccountPortfolio(portfolio: AccountToken[]) {
-        let activeNetworks = this.networkProvider.getActiveNetworks();
-        this.activeAccount.portfolio[activeNetworks.name] = portfolio;
-        return this.profileProvider.saveProfile();
+    public refreshActiveAccount(portfolio: AccountToken[], contracts: Contract[]) {
+        this.setActiveAccountPortfolio(portfolio);
+        this.setActiveAccountContracts(contracts);
     }
 
-    public setActiveAccountContracts(contracts: Contract[]) {
+    public setActiveAccountPortfolio(portfolio: AccountToken[]) : Account {
+        let activeNetworks = this.networkProvider.getActiveNetworks();
+        this.activeAccount.portfolio[activeNetworks.name] = portfolio;
+        return this.activeAccount;
+    }
+
+    private setActiveAccountContracts(contracts: Contract[]) {
         let activeNetworks = this.networkProvider.getActiveNetworks();
 
         if(!this.activeAccount.contracts) {
             this.activeAccount.contracts = {};
         }
         this.activeAccount.contracts[activeNetworks.name] = contracts;
-        return this.profileProvider.saveProfile();
     }
 }

@@ -23,12 +23,36 @@ export class VotingPage {
     private accountProvider: AccountProvider) {
   }
 
+  canVote() {
+    return this.voteIsPending() && !this.contract.vote.hasVoted;
+  }
+
+  noTokenOwned() {
+    return this.voteExist() && this.contract.vote.voteTokenOwned == 0;
+  }
+
+  hasAlreadyVoted() {
+    return this.voteIsPending() && this.contract.vote.hasVoted;
+  }
+
+  voteIsPending() {
+    return this.voteExist() && !this.isClosed();
+  }
+
+  voteIsClosed() {
+    return this.voteExist() && this.isClosed();
+  }
+
+  voteExist() {
+    return this.contract && this.contract.vote && this.contract.vote.startedAt > 0;
+  }
+
   isClosedAtDefined() {
     return (this.contract.vote.closedAt < Number.MAX_SAFE_INTEGER);
   }
 
   isClosed() {
-    return this.contract.vote.closedAt < (new Date().getTime() / 1000);
+    return this.contract.vote.closedAt < new Date().getTime();
   }
 
   getContractName() {

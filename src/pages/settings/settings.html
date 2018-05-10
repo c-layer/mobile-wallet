@@ -50,25 +50,30 @@
       <ion-icon name="arrow-dropright" item-end></ion-icon>
     </button>
     <ion-item-divider color="secondary">Storage</ion-item-divider>
-    <ion-label *ngIf="!hasCache" text-center>No cache data</ion-label>
+    <ion-item>
+      <ion-label item-start>Cache size</ion-label>
+      <ion-label class="info">{{ cacheSize }}</ion-label>
+    </ion-item>
+    <button ion-item no-line full text-center color="secondary-light" [disabled]="!hasCache"
+      (click)="clearCache()" class="button-item">
+      <div *ngIf="!hasCache">No cache data</div>
+      <div *ngIf="hasCache">
+        Clear cache
+      </div>
+      <ion-icon name="trash" item-end *ngIf="hasCache"></ion-icon>
+    </button>
+    <button ion-item no-line full text-center color="secondary-light" [disabled]="configReset"
+      (click)="resetConfig()" class="button-item">
+      <div *ngIf="configReset">Config was reset</div>
+      <div *ngIf="!configReset">
+        Reset config
+      </div>
+      <ion-icon name="trash" *ngIf="!configReset" item-end></ion-icon>
+    </button>
     <button ion-item text-center color="warn" (click)="backupMnemonic()" *ngIf="!profile.mnemonicIsBackup"
       class="button-item">
       Backup Mnemonic
       <ion-icon name="warning" item-end></ion-icon>
-    </button>
-    <ion-item *ngIf="hasCache">
-      <ion-label item-start>Cache size</ion-label>
-      <ion-label class="info">{{ cacheSize }}</ion-label>
-    </ion-item>
-    <button ion-item no-line full text-center color="secondary-light" *ngIf="hasCache" (click)="clearCache()"
-      class="button-item">
-      Clear cache
-      <ion-icon name="trash" item-end></ion-icon>
-    </button>
-    <button ion-item no-line full text-center color="secondary-light" (click)="resetConfig()"
-      class="button-item">
-      Reset config
-      <ion-icon name="trash" item-end></ion-icon>
     </button>
     <button ion-item text-center color="valid" class="button-item" (click)="backupMnemonic()"
       *ngIf="profile.mnemonicIsBackup">

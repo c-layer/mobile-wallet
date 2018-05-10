@@ -78,10 +78,11 @@ export class Web3Provider {
   }
 
   start() {
+    this.readySubject = new ReplaySubject(1);
     let profile = this.profileProvider.getProfile();
 
     let networks = null;
-    if(profile && profile.networks) {
+    if (profile && profile.networks) {
       networks = profile.networks;
     } else {
       networks = this.profileProvider.getDefaultNetworks();
@@ -94,25 +95,39 @@ export class Web3Provider {
       }
     })
 
+    let promises = [];
     if (activeNetwork.RSK) {
       this.rsk.web3 = new Web3(new Web3.providers.HttpProvider(activeNetwork.RSK.url));
-      this.rsk.web3.eth.getBlockNumber().then(number =>
-        this.rsk.blockNumber = number
-      );
-      } else {
+      try {
+        promises.push(Promise.resolve(null).then(this.rsk.web3.eth.getBlockNumber()).then(number =>
+          this.rsk.blockNumber = number
+        ).catch((error) => {
+          console.error(error);
+        }));
+      } catch (error) {
+        console.error(error);
+        delete this.rsk.web3;
+      };
+    } else {
       delete this.rsk.web3;
     }
 
     if (activeNetwork.ETH) {
       this.eth.web3 = new Web3(new Web3.providers.WebsocketProvider(activeNetwork.ETH.url));
-      this.eth.web3.eth.getBlockNumber().then(number =>
+      try {
+      promises.push(this.eth.web3.eth.getBlockNumber().then(number =>
         this.eth.blockNumber = number
-      );
-      } else {
+      ));
+    } catch(error) {
+      console.error(error);
+    }
+    } else {
       delete this.eth.web3;
     }
 
     this.readySubject.next(null);
     this.readySubject.complete;
+
+    return Promise.all(promises);
   }
 }

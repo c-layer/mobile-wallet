@@ -45,6 +45,42 @@ export class FormatProvider {
             + ':' + digits2(date.getSeconds());
     }
 
+    public formatTimeAgo(timestamp: number) {
+        let now = new Date();
+        let before = new Date(timestamp * 1000);
+        let ago = new Date().getTime() - timestamp * 1000;
+
+        let yearDiff = now.getFullYear() - before.getFullYear();
+        if(yearDiff > 1) {
+            return yearDiff+' years ago';
+        }
+
+        let monthDiff =  (12*yearDiff) + now.getMonth() - before.getMonth();
+        if(monthDiff > 1) {
+            return monthDiff+' months ago';
+        }
+
+        let dayDiff = (monthDiff*new Date(now.getFullYear(), now.getMonth()+1, 0).getDate())
+             + now.getDay() - before.getDay();
+        if(dayDiff > 1) {
+            return dayDiff+' days ago';
+        }
+
+        let hourDiff = (dayDiff*24) + now.getHours() - before.getHours();
+        if(hourDiff > 1) {
+            return hourDiff+' hours ago';
+        }
+        let minuteDiff = (hourDiff*60) + now.getMinutes() - before.getMinutes();
+        if(minuteDiff > 1) {
+            return minuteDiff+' minutes ago';
+        }
+        let secondsDiff = (minuteDiff*60) + now.getSeconds() - before.getSeconds()
+        if(secondsDiff > 1) {
+            return secondsDiff+' seconds ago';
+        }
+        return ' a moment ago';
+    }
+
     formatHexadecimal(value: string) {
         return '0x' + parseInt(value).toString(16);
     }

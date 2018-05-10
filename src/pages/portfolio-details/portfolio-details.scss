@@ -16,6 +16,10 @@ page-portfolio-details {
         border-color: color($colors, secondary) !important;
     }
 
+    .not-registred {
+        color: #F5861F;
+    }
+
     .nohistory { 
         text-align: center;
     }
@@ -44,20 +48,33 @@ page-portfolio-details {
         right: 0px;
     }
 
+    .transfer >  * > * > ion-label  {
+        margin: 0px 0px 10px 0px;
+    }
+
     .positiveAmount {
         color: color($colors, primary) !important;    
         width: 40%;
+        text-align: right;
         display: inline-block;
     }
 
     .negativeAmount {
         color: color($colors, danger) !important;      
         width: 40%;
+        text-align: right;
         display: inline-block;
     }
 
     .account {
         display: inline-block;
         text-align: right;
+        width: 55%;
+    }
+
+    .time {
+        display: inline-block;
+        font-size: 12px;
+        margin-bottom: 10px;
     }
 }

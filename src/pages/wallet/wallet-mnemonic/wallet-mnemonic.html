@@ -34,7 +34,7 @@
       <button ion-button full (click)="backup()" class="actions">Backup Now !</button>
       <button ion-button full (click)="proceed()" class="actions" 
         *ngIf="mode==walletMnemonicMode.GENERATE"
-        outline>Proceeed anyway and backup later !</button>
+        outline>Proceed anyway and backup later !</button>
     </fieldset>
   </div>
   <div *ngIf="mode == walletMnemonicMode.BACKUP || ((mode == walletMnemonicMode.GENERATE) && backingUp)">

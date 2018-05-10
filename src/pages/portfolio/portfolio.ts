@@ -1,5 +1,5 @@
-import { Component } from '@angular/core';
-import { NavController, Refresher } from 'ionic-angular';
+import { Component, ViewChild } from '@angular/core';
+import { NavController, Refresher, Events } from 'ionic-angular';
 import { PortfolioDetailsPage } from "../portfolio-details/portfolio-details";
 import { TransferPage } from "../transfer/transfer";
 import { AccountProvider } from "../../providers/account";
@@ -10,6 +10,8 @@ import { LoaderProvider } from '../../providers/loader';
 import { Subscription } from 'rxjs/Subscription';
 import { ContractProvider } from '../../providers/contract';
 import { VotingPage } from '../portfolio-details/voting/voting';
+import { Observable } from 'rxjs';
+import { ProfileProvider } from '../../providers/profile';
 
 @Component({
   selector: 'page-portfolio',
@@ -20,10 +22,13 @@ export class PortfolioPage {
   private activeAccount: Account;
   private portfolioSubscription: Subscription;
   private contractSubscription: Subscription;
-  private refresher: Refresher;
+
+  @ViewChild(Refresher) refresher: Refresher;
 
   constructor(private navCtrl: NavController, private currencyProvider: CurrencyProvider,
     public accountProvider: AccountProvider, public formatProvider: FormatProvider,
+    private profileProvider: ProfileProvider,
+    private events: Events,
     private loaderProvider: LoaderProvider, private contractProvider: ContractProvider) {
   }
 
@@ -49,13 +54,13 @@ export class PortfolioPage {
   }
 
   goToContractDetailsPage(contract) {
-    if(contract.share) {
+    if (contract.share) {
       this.navCtrl.push(VotingPage, { contract: contract });
     }
   }
 
   getCore() {
-    if(!this.activeAccount.portfolio) {
+    if (!this.activeAccount.portfolio) {
       return [];
     }
     return this.accountProvider.getActiveAccountPortfolio()
@@ -63,7 +68,7 @@ export class PortfolioPage {
   }
 
   getTokens(network) {
-    if(!this.activeAccount.portfolio) {
+    if (!this.activeAccount.portfolio) {
       return [];
     }
     return this.accountProvider.getActiveAccountPortfolio()
@@ -71,7 +76,7 @@ export class PortfolioPage {
   }
 
   getContracts(network) {
-    if(!this.activeAccount.contracts) {
+    if (!this.activeAccount.contracts) {
       return [];
     }
     return this.accountProvider.getActiveAccountContracts().filter(item =>
@@ -79,46 +84,54 @@ export class PortfolioPage {
   }
 
   canVote(contract) {
-    if(contract && contract.vote) {
+    if (contract && contract.vote) {
       let vote = contract.vote;
       let now = new Date().getTime();
-      return (vote.startedAt < now && vote.closedAt > now );
+      return (vote.startedAt < now && vote.closedAt > now);
     }
     return false;
   }
 
-  doRefresh(refresher) {
-    this.refresher = refresher;
+  doRefresh() {
     if (this.activeAccount) {
-      this.loaderProvider.startWeb3();
-      this.portfolioSubscription = this.currencyProvider.portfolioObs(this.activeAccount)
-        .first().subscribe(data => {
+      try {
+      this.loaderProvider.startWeb3().catch(error => console.log);
+      this.portfolioSubscription = Observable.forkJoin(
+        this.currencyProvider.portfolioObs(this.activeAccount),
+        this.contractProvider.contractsObs(this.activeAccount))
+        .first().catch((error) => {
+          console.error(error);
+          return [];
+        }).subscribe(data => {
           if (data.length > 0) {
-            this.loaderProvider.setStatus('PortfolioLoaded');
+            let accounts = data[0];
+            let contracts = data[1];
+
+            this.loaderProvider.setStatus('AccountRefreshed !');
             this.loaderProvider.endStart();
 
             let portfolio = this.accountProvider.getActiveAccountPortfolio();
             portfolio.forEach(token => {
-              data.forEach(item => {
-                if(item.currency == token.currency && token.isCore) {
+              accounts.forEach(item => {
+                if (item.currency == token.currency && token.isCore) {
                   item.untilBlock = token.untilBlock;
                   item.transactions = token.transactions;
                 }
               });
             });
 
-            portfolio = data;
-            this.accountProvider.setActiveAccountPortfolio(portfolio);
+            portfolio = accounts;
+            this.accountProvider.refreshActiveAccount(portfolio, contracts);
+            this.profileProvider.saveProfile();
           }
-          if(refresher) {
-            refresher.complete();
+          if (this.refresher) {
+            this.refresher.complete();
           }
         });
-        this.contractSubscription = this.contractProvider.contractsObs(this.activeAccount)
-          .first().subscribe(data => {
-            let contracts = data;
-            this.accountProvider.setActiveAccountContracts(contracts);
-          });
+      } catch(e) {
+        console.error(e);
+        this.refresher.complete();
+      }
     }
   }
 
@@ -128,21 +141,21 @@ export class PortfolioPage {
     if (!this.activeAccount) {
       this.navCtrl.parent.select(1);
       return;
-    }   
+    }
   }
 
   ionViewDidEnter() {
-    this.doRefresh(null);
+    this.doRefresh()
   }
 
   ionViewWillLeave() {
-    if(this.refresher && this.refresher.state == 'refreshing') {
+    if (this.refresher && this.refresher.state == 'refreshing') {
       this.refresher.cancel();
     }
     if (this.portfolioSubscription) {
       this.portfolioSubscription.unsubscribe();
     }
-    if(this.contractSubscription) {
+    if (this.contractSubscription) {
       this.contractSubscription.unsubscribe();
     }
   }

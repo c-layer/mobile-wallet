@@ -8,7 +8,7 @@ import { Account } from '../model/account';
 export class ProfileProvider {
     private static STORAGE_KEY = 'mtpelerin';
     private static MIN_VERSION = '0.1.12';
-    private static CURRENT_VERSION = '0.1.14';
+    private static CURRENT_VERSION = '0.1.15';
     private profile: Profile;
 
     constructor(private storage: Storage) { }
@@ -52,7 +52,6 @@ export class ProfileProvider {
     }
 
     public saveProfile(): Observable<Profile> {
-        console.log(this.profile);
         return Observable.fromPromise(this.storage.set(ProfileProvider.STORAGE_KEY, this.profile)
             .then(() => {
                 console.log('profile saved !');

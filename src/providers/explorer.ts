@@ -4,6 +4,7 @@ import { BehaviorSubject } from 'rxjs';
 
 @Injectable()
 export class ExplorerProvider {
+    public static MAX_TRIE = 8000;
 
     constructor() { }
 
@@ -25,9 +26,10 @@ export class ExplorerProvider {
                 })
             );
         }).then(txs => {
-            let filteredTxs = txs.filter(tx => (tx && (tx.from == address || tx.to == address)));
-
             let remainingBalance = diffBalance;
+            let filteredTxs =
+                txs.filter(tx => (tx && (tx.from == address || tx.to == address)));
+
             filteredTxs.forEach(tx => {
                 if (tx.from == address) {
                     remainingBalance -= tx.amount;
@@ -39,16 +41,18 @@ export class ExplorerProvider {
             })
 
             if (remainingBalance > 0) {
-                let tx = {
-                    blockNumber: blockId,
-                    from: '0x0000000000000000000000000000000001000006',
-                    to: address,
-                    value: '' + remainingBalance,
-                    timestamp: txs[0].timestamp,
-                    gas: 0,
-                    gasPrice: 0
+                if (result.network == 'RSK') {
+                    let tx = {
+                        blockNumber: blockId,
+                        from: '0x0000000000000000000000000000000001000006',
+                        to: address,
+                        value: '' + remainingBalance,
+                        timestamp: txs[0].timestamp,
+                        gas: 0,
+                        gasPrice: 0
+                    }
+                    resultValue.transactions.push(tx);
                 }
-                resultValue.transactions.push(tx);
             }
             resultValue.completion++;
             result.next(resultValue);
@@ -63,7 +67,7 @@ export class ExplorerProvider {
 
     private exploration(web3, account, result, resultValue,
         start, end, fTxCountStart, fTxCountEnd, fTxBalanceStart, fTxBalanceEnd) {
-        if(resultValue.errors > 0) {
+        if (resultValue.errors > 0) {
             return;
         }
 
@@ -98,9 +102,9 @@ export class ExplorerProvider {
                 result.next(resultValue);
             }
         }).catch(err => {
-            console.log('exploration['+account.name+', '+resultValue.network+', '
-                +start+', '+end+', '+fTxCountStart+', '+fTxCountEnd+', '
-                +fTxBalanceStart+', '+fTxBalanceEnd+']');
+            console.log('exploration[' + account.name + ', ' + resultValue.network + ', '
+                + start + ', ' + end + ', ' + fTxCountStart + ', ' + fTxCountEnd + ', '
+                + fTxBalanceStart + ', ' + fTxBalanceEnd + ']');
             console.log(err);
             resultValue.errors++;
             result.next(resultValue);
@@ -110,6 +114,7 @@ export class ExplorerProvider {
     public findCoreTransactions(web3, network, account: Account, start = 0) {
         let resultValue = {
             network: network,
+            start: start,
             startTime: new Date().getTime(),
             block: null,
             transactions: [],
@@ -122,12 +127,18 @@ export class ExplorerProvider {
             web3.eth.getTransactionCount(account.address),
             web3.eth.getBalance(account.address),
         ];
-        if (start > 0) {
-            initPromises.push(web3.eth.getTransactionCount(account.address, start));
-            initPromises.push(web3.eth.getBalance(account.address, start));
-        }
 
         Promise.all(initPromises).then(data => {
+            let min = data[0] - ExplorerProvider.MAX_TRIE;
+            let startingAt = (start > min) ? start : min;
+
+            resultValue.start = startingAt;
+            if (startingAt > 0) {
+                data.push(web3.eth.getTransactionCount(account.address, startingAt));
+                data.push(web3.eth.getBalance(account.address, startingAt));
+            }
+            return Promise.all(data);
+        }).then(data => {
             let block = data[0];
             let txCount = data[1];
             let txBalance = data[2];
@@ -139,13 +150,13 @@ export class ExplorerProvider {
                 txBalanceAtStart = data[4];
             }
 
-            resultValue.block = block - start;
-
-            if ((txCount - txCountAtStart > 0 || txBalance - txBalanceAtStart != 0) && start < block) {
+            resultValue.block = block;
+            if ((txCount - txCountAtStart > 0 || txBalance - txBalanceAtStart != 0)
+                && resultValue.start < block) {
                 this.exploration(web3, account, result, resultValue,
-                    start, block, txCountAtStart, txCount, txBalanceAtStart, txBalance);
+                    resultValue.start, block, txCountAtStart, txCount, txBalanceAtStart, txBalance);
             } else {
-                resultValue.completion = block - start;
+                resultValue.completion = block - resultValue.start;
                 result.next(resultValue);
             }
         }).catch(err => {
@@ -158,10 +169,10 @@ export class ExplorerProvider {
         result.subscribe(value => {
             let completion = 0;
             if (value.block) {
-                completion = Math.floor(value.completion
+                completion = Math.floor((value.start + value.completion)
                     / value.block * 10000) / 100;
             }
-            if (value.completion == value.block) {
+            if (value.completion+value.start == value.block) {
                 let time = (new Date()).getTime() - value.startTime;
                 console.log('Completion: ' + completion + '%, '
                     + 'explored: ' + value.completion + ' and '

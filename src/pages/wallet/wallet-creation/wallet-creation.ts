@@ -49,17 +49,6 @@ export class WalletCreationPage {
         console.log('Profile created !');
         this.loadingMessage = 'creating wallet...';
         return this.accountProvider.createWallet(this.mnemonic, this.passphrase, this.password);
-      }).flatMap(profile => {
-        console.log('Wallet created !');
-        this.loadingMessage = 'adding first account...';
-        return this.accountProvider.addAccount(null, this.password, 'Main Account');
-      }).flatMap(account => {
-        console.log('Fetching first account data');
-        this.loadingMessage = 'Fetching first account data...';
-         return this.currencyProvider.portfolioObs(account);
-      }).flatMap(portfolio => {
-        this.loadingMessage = 'Persisting profile...';
-          return this.accountProvider.setActiveAccountPortfolio(portfolio);
       }).catch(error => {
         console.error('Error found : '+error);
         this.error = error;
