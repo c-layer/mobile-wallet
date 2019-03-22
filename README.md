@@ -1,2 +1,1 @@
-# mtwallet
-My Token Wallet by MtPelerin
+# mobile wallet
